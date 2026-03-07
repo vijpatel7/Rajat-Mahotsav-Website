@@ -27,6 +27,15 @@ export const tagColors: Record<string, { bg: string; text: string; border: strin
 
 export const eventsData: EventData[] = [
   {
+    id: "13",
+    date: "2026-02-01",
+    title: "Secaucus Temple Prepares over 1,750 meals for school kids",
+    description: "Volunteers at Shree Swaminarayan Temple Secaucus came together to prepare and package over 1,750 PB&J meals with an apple, granola bar, and water for each child. The temple then delivered these meals to school kids in the Bronx, NYC as part of its ongoing commitment to community service and youth support.",
+    tags: ["community seva", "youth event"],
+    youtubeVideoId: "4jqrxR1_v1I",
+    photos: []
+  },
+  {
     id: "12",
     date: "2025-02-21",
     title: "Annual Holiday Food & Toy Drive",
