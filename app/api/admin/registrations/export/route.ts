@@ -169,8 +169,7 @@ export async function GET(request: Request) {
         hasMore = result.hasMore === true && nextCursorVal != null
 
         if (rows.length > 0) {
-          const csvChunk =
-            rows.map(rowToCsvLine).join("\n") + (rows.length > 0 ? "\n" : "")
+          const csvChunk = rows.map(rowToCsvLine).join("\n") + "\n"
           controller.enqueue(encoder.encode(csvChunk))
         }
 
