@@ -120,7 +120,12 @@ const INITIAL_FILTERS: FilterState = {
   departureTo: "",
 }
 
-export function AdminRegistrationsTable() {
+type AdminRegistrationsTableProps = {
+  /** Total from get_registrations_stats (same as dashboard). Used when no filters applied. */
+  initialTotalCount?: number | null
+}
+
+export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegistrationsTableProps) {
   const [loaded, setLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -138,6 +143,7 @@ export function AdminRegistrationsTable() {
   } | null>(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [pageInfo, setPageInfo] = useState<PageInfo>({ startIndex: 1 })
+  const [totalCount, setTotalCount] = useState<number | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasLoadedOnceRef = useRef(false)
   const mandalOptions = getAllMandalOptionsStored()
@@ -187,9 +193,57 @@ export function AdminRegistrationsTable() {
     [pageSize, filters]
   )
 
+  /** Build filter-only query string for count and export (no pagination). */
+  const buildFilterParams = useCallback(() => {
+    const params = new URLSearchParams()
+    if (filters.search.trim().length >= 2)
+      params.set("search", filters.search.trim())
+    if (filters.ghaam) params.set("ghaam", filters.ghaam)
+    if (filters.mandal) params.set("mandal", filters.mandal)
+    if (filters.country) params.set("country", filters.country)
+    if (filters.age != null) params.set("age", String(filters.age))
+    if (filters.ageMin != null) params.set("age_min", String(filters.ageMin))
+    if (filters.ageMax != null) params.set("age_max", String(filters.ageMax))
+    if (filters.arrivalFrom) params.set("arrival_from", filters.arrivalFrom)
+    if (filters.arrivalTo) params.set("arrival_to", filters.arrivalTo)
+    if (filters.departureFrom)
+      params.set("departure_from", filters.departureFrom)
+    if (filters.departureTo) params.set("departure_to", filters.departureTo)
+    return params
+  }, [filters])
+
+  /** Build filter-only query string for "Export current view" (no pagination). */
+  const buildExportFilterParams = useCallback(
+    () => buildFilterParams().toString(),
+    [buildFilterParams]
+  )
+
+  /** Fetch total row count for current filters. Only call on load or filter change, not when paginating. */
+  const fetchCount = useCallback(async () => {
+    try {
+      const qs = buildFilterParams().toString()
+      const res = await fetch(
+        `/api/admin/registrations/count${qs ? `?${qs}` : ""}`
+      )
+      const data = await res.json()
+      if (res.ok && typeof data.count === "number") {
+        setTotalCount(data.count)
+      } else {
+        setTotalCount(null)
+      }
+    } catch {
+      setTotalCount(null)
+    }
+  }, [buildFilterParams])
+
   const applyPageData = useCallback(
-    (data: PaginatedResponse, direction: "next" | "prev") => {
-      const fetchedRows = data.rows ?? []
+    (
+      data: PaginatedResponse,
+      direction: "next" | "prev",
+      effectivePageSize: number
+    ) => {
+      // Only ever display one page of results; cap in case API returns cumulative rows
+      const fetchedRows = (data.rows ?? []).slice(0, effectivePageSize)
       setRows(fetchedRows)
       setNextCursor(data.nextCursor ?? null)
       setPrevCursor(data.prevCursor ?? null)
@@ -237,7 +291,8 @@ export function AdminRegistrationsTable() {
           return
         }
 
-        applyPageData(data, direction)
+        const effectivePageSize = pageSizeOverride ?? pageSize
+        applyPageData(data, direction, effectivePageSize)
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
           return
@@ -269,8 +324,12 @@ export function AdminRegistrationsTable() {
       hasLoadedOnceRef.current = true
       return
     }
-    // Reset to first page when filters change
+    // Reset to first page when filters change (not when paginating)
     setPageInfo({ startIndex: 1 })
+    if (hasActiveFilters(filters)) {
+      setTotalCount(null)
+      fetchCount()
+    }
     fetchPage(null, "next")
   }, [
     loaded,
@@ -286,6 +345,7 @@ export function AdminRegistrationsTable() {
     filters.departureTo,
     filters.search,
     fetchPage,
+    fetchCount,
   ])
 
   const handleLoadRegistrations = () => {
@@ -371,10 +431,11 @@ export function AdminRegistrationsTable() {
           <a
             href="/api/registrations/export"
             download
-            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium admin-btn-primary text-sm"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium admin-btn-outline text-sm border-2 border-[rgb(254,215,170)]"
+            aria-label="Export entire registration list as CSV"
           >
             <Download className="size-4" aria-hidden />
-            Export CSV
+            Export entire registration list
           </a>
         </div>
       </div>
@@ -447,15 +508,26 @@ export function AdminRegistrationsTable() {
               ))}
             </select>
             {hasActiveFilters(filters) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-                className="col-span-2 w-full sm:col-span-1 sm:w-auto rounded-full px-4 py-2 admin-btn-outline"
-              >
-                <X className="size-4 mr-1" aria-hidden />
-                Clear filters
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearFilters}
+                  className="col-span-2 w-full sm:col-span-1 sm:w-auto rounded-full px-4 py-2 admin-btn-outline"
+                >
+                  <X className="size-4 mr-1" aria-hidden />
+                  Clear filters
+                </Button>
+                <a
+                  href={`/api/admin/registrations/export?${buildExportFilterParams()}`}
+                  download
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium admin-btn-primary text-sm col-span-2 w-full sm:col-span-1 sm:w-auto sm:min-w-0 justify-center"
+                  aria-label="Export current view as CSV (with current filters)"
+                >
+                  <Download className="size-4 shrink-0" aria-hidden />
+                  Export current view
+                </a>
+              </>
             )}
           </div>
 
@@ -737,9 +809,14 @@ export function AdminRegistrationsTable() {
 
               {/* Pagination footer */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 pt-4 border-t-2 border-[rgb(254,215,170)]">
-                <p className="text-sm reg-text-secondary">
-                  Showing rows {pageInfo.startIndex}–{pageInfo.startIndex + rows.length - 1}
-                </p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <p className="text-sm reg-text-secondary">
+                    Showing rows {pageInfo.startIndex}–{pageInfo.startIndex + rows.length - 1}
+                  </p>
+                  <p className="text-sm reg-text-secondary">
+                    Total rows: {hasActiveFilters(filters) ? (totalCount != null ? totalCount : "—") : (initialTotalCount ?? "—")}
+                  </p>
+                </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

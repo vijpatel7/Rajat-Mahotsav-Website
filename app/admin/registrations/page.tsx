@@ -62,7 +62,7 @@ export default async function AdminRegistrationsPage() {
             <>
               <AdminDashboardStats stats={stats} userEmail={user.email ?? ""} />
               <div className="mt-6">
-                <AdminRegistrationsTable />
+                <AdminRegistrationsTable initialTotalCount={stats.total_registrations} />
               </div>
             </>
           ) : (
