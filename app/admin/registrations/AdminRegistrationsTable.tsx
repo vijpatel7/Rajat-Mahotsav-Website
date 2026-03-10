@@ -335,6 +335,7 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
       fetchCount()
     } else if (initialTotalCount == null) {
       // No filters and no stats total (e.g. stats unavailable): fetch unfiltered count so we don't show "—"
+      setTotalCount(null)
       fetchCount()
     }
     fetchPage(null, "next")
