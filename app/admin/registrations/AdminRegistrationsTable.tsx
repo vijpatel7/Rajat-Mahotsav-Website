@@ -329,6 +329,9 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
     if (hasActiveFilters(filters)) {
       setTotalCount(null)
       fetchCount()
+    } else if (initialTotalCount == null) {
+      // No filters and no stats total (e.g. stats unavailable): fetch unfiltered count so we don't show "—"
+      fetchCount()
     }
     fetchPage(null, "next")
   }, [
@@ -352,6 +355,8 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
     fetchDistinctValues()
     fetchPage(null, "next")
     setPageInfo({ startIndex: 1 })
+    // When stats unavailable, initialTotalCount is not passed; fetch count so total rows can still be shown
+    if (initialTotalCount == null) fetchCount()
   }
 
   const handleNext = () => {
@@ -814,7 +819,7 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
                     Showing rows {pageInfo.startIndex}–{pageInfo.startIndex + rows.length - 1}
                   </p>
                   <p className="text-sm reg-text-secondary">
-                    Total rows: {hasActiveFilters(filters) ? (totalCount != null ? totalCount : "—") : (initialTotalCount ?? "—")}
+                    Total rows: {hasActiveFilters(filters) ? (totalCount != null ? totalCount : "—") : (initialTotalCount ?? totalCount ?? "—")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
