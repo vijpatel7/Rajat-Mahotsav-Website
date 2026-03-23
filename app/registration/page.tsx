@@ -18,7 +18,6 @@ import { Toaster } from "@/components/molecules/toaster"
 import { useToast } from "@/hooks/use-toast"
 
 import { useDeviceType } from "@/hooks/use-device-type"
-import { supabase } from "@/utils/supabase/client"
 import { emailSchema } from "@/lib/email-validation"
 import "@/styles/registration-theme.css"
 
@@ -138,48 +137,28 @@ export default function RegistrationPage() {
         departure_date: data.dateRange.end?.toString()
       }
 
-      // First, check if record exists
-      const { data: existingRecord } = await supabase
-        .from('registrations')
-        .select('id')
-        .eq('first_name', dbData.first_name)
-        .eq('age', dbData.age)
-        .eq('email', dbData.email)
-        .eq('mobile_number', dbData.mobile_number)
-        .maybeSingle()
+      const response = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dbData),
+      })
 
-      let error = null
+      const result = await response.json()
 
-      if (existingRecord) {
-        // Update existing record
-        const { error: updateError } = await supabase
-          .from('registrations')
-          .update(dbData)
-          .eq('id', existingRecord.id)
-        error = updateError
-      } else {
-        // Insert new record
-        const { error: insertError } = await supabase
-          .from('registrations')
-          .insert([dbData])
-        error = insertError
-      }
-
-      if (!error) {
-        const isUpdate = existingRecord !== null
+      if (response.ok) {
         toast({
-          title: isUpdate ? `Updated existing registration, ${data.firstName}!` : `Successfully registered, ${data.firstName}!`,
+          title: result.updated ? `Updated existing registration, ${data.firstName}!` : `Successfully registered, ${data.firstName}!`,
           description: "Jay Shree Swaminarayan",
           className: "bg-green-500 text-white border-green-400 shadow-xl font-medium",
         })
       } else {
         toast({
           title: "Registration failed",
-          description: error.message,
+          description: result.error ?? "Please check your connection and try again.",
           className: "bg-red-500 text-white border-red-400 shadow-xl font-medium",
         })
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Registration failed",
         description: "Please check your connection and try again.",
