@@ -11,7 +11,7 @@ import { Send, Loader2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/card"
 import { Toaster } from "@/components/molecules/toaster"
 import { useToast } from "@/hooks/use-toast"
-import { supabase } from "@/utils/supabase/client"
+import { supabasePublic as supabase } from "@/utils/supabase/public-client"
 import "@/styles/registration-theme.css"
 
 const FormSchema = z.object({

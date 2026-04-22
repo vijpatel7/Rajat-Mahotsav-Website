@@ -27,7 +27,7 @@ import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { PathOfServiceStory } from "@/components/organisms/path-of-service-story"
 import { Toaster } from "@/components/molecules/toaster"
 import { cn } from "@/lib/utils"
-import { supabase } from "@/utils/supabase/client"
+import { supabasePublic as supabase } from "@/utils/supabase/public-client"
 import "@/styles/community-service-theme.css"
 import "@/styles/registration-theme.css"
 
