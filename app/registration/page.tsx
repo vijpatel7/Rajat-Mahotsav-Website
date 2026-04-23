@@ -18,7 +18,7 @@ import { Toaster } from "@/components/molecules/toaster"
 import { useToast } from "@/hooks/use-toast"
 
 import { useDeviceType } from "@/hooks/use-device-type"
-import { supabase } from "@/utils/supabase/client"
+import { supabasePublic as supabase } from "@/utils/supabase/public-client"
 import { emailSchema } from "@/lib/email-validation"
 import "@/styles/registration-theme.css"
 
