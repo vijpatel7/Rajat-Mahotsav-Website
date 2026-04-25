@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
 
   if (
     request.nextUrl.pathname.startsWith("/admin") ||
+    request.nextUrl.pathname.startsWith("/api/admin") ||
     request.nextUrl.pathname === "/api/registrations/export"
   ) {
     supabaseResponse.headers.set("Cache-Control", "no-store, max-age=0")
