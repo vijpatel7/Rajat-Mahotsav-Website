@@ -261,7 +261,7 @@ export default function SevaSubmissionPage() {
   const getMandals = (country: string) => {
     const mandalOptions = {
       "england": ["Bolton", "London"],
-      "usa": ["Alabama", "California", "Chicago", "Delaware", "Georgia", "Horseheads", "Kentucky", "New Jersey", "Ocala", "Ohio", "Seattle", "Tennessee", "Toronto"]
+      "usa": ["Alabama", "California", "Chicago", "Delaware", "Georgia", "Horseheads", "Kentucky", "New Jersey", "Ocala", "Ohio", "Seattle", "Tennessee", "Virginia"]
     }
     return mandalOptions[country as keyof typeof mandalOptions] || []
   }
