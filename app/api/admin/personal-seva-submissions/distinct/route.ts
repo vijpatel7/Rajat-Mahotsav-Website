@@ -59,7 +59,14 @@ export async function GET() {
     )
   }
 
-  const rows = data ?? []
+  const rows =
+    (data as
+      | {
+          country?: unknown
+          mandal?: unknown
+          activity_name?: unknown
+        }[]
+      | null) ?? []
 
   return NextResponse.json(
     {

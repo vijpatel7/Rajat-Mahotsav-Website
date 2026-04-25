@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
   PERSONAL_SEVA_COLUMNS,
+  type PersonalSevaRow,
   applyPersonalSevaFilters,
   parsePersonalSevaFilters,
   parsePersonalSevaPageSize,
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
     )
   }
 
-  const fetchedRows = data ?? []
+  const fetchedRows = ((data ?? []) as unknown) as PersonalSevaRow[]
   const hasExtraRow = fetchedRows.length > pageSize
   const pageRows =
     direction === "prev"

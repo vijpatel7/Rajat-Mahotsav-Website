@@ -7,6 +7,7 @@ import {
   hasPersonalSevaFilters,
   parsePersonalSevaFilters,
   personalSevaRowToCsvLine,
+  type PersonalSevaRow,
 } from "@/lib/personal-seva-admin"
 
 const CHUNK_SIZE = 500
@@ -84,7 +85,7 @@ export async function GET(request: Request) {
           return
         }
 
-        const rows = data ?? []
+        const rows = (data ?? []) as unknown as PersonalSevaRow[]
         if (rows.length > 0) {
           controller.enqueue(
             encoder.encode(rows.map(personalSevaRowToCsvLine).join("\n") + "\n")
