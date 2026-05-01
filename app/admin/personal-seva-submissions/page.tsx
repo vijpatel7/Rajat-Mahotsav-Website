@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
+import { PERSONAL_SEVA_TABLE } from "@/lib/personal-seva-admin"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { AdminSignIn } from "../registrations/AdminSignIn"
 import { AdminPersonalSevaTable } from "./AdminPersonalSevaTable"
@@ -37,7 +38,7 @@ export default async function AdminPersonalSevaSubmissionsPage() {
     }
 
     const { count } = await supabase
-      .from("personal_seva_submission")
+      .from(PERSONAL_SEVA_TABLE)
       .select("id", { count: "exact", head: true })
 
     return (
@@ -45,7 +46,7 @@ export default async function AdminPersonalSevaSubmissionsPage() {
         <div className="container mx-auto px-4 page-bottom-spacing max-w-6xl">
           <StandardPageHeader
             title="Personal Seva Submissions"
-            description="Secret admin view for reviewing community personal seva entries and exporting the latest results."
+            description="Secret admin view for reviewing spiritual personal seva entries and exporting the latest results."
           />
           <AdminPersonalSevaTable initialTotalCount={count ?? null} />
         </div>

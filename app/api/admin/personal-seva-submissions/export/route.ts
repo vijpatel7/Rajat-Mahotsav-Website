@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
   PERSONAL_SEVA_COLUMNS,
+  PERSONAL_SEVA_TABLE,
   applyPersonalSevaFilters,
   hasPersonalSevaFilters,
   parsePersonalSevaFilters,
@@ -71,7 +72,7 @@ export async function GET(request: Request) {
       while (hasMore) {
         const to = from + CHUNK_SIZE - 1
         let query = supabase
-          .from("personal_seva_submission")
+          .from(PERSONAL_SEVA_TABLE)
           .select(PERSONAL_SEVA_COLUMNS.join(","))
 
         query = applyPersonalSevaFilters(query, filters)

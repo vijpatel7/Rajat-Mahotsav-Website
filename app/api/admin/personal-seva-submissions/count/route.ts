@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
+  PERSONAL_SEVA_TABLE,
   applyPersonalSevaFilters,
   parsePersonalSevaFilters,
 } from "@/lib/personal-seva-admin"
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const filters = parsePersonalSevaFilters(searchParams)
   let query = supabase
-    .from("personal_seva_submission")
+    .from(PERSONAL_SEVA_TABLE)
     .select("id", { count: "exact", head: true })
 
   query = applyPersonalSevaFilters(query, filters)
