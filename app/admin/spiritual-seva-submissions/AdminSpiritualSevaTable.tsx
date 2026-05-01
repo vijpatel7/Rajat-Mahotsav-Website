@@ -24,7 +24,7 @@ type PageInfo = {
   startIndex: number
 }
 
-type PersonalSevaRow = {
+type SpiritualSevaRow = {
   id: number
   created_at: string | null
   first_name: string | null
@@ -48,7 +48,7 @@ type PersonalSevaRow = {
 
 type PaginatedResponse = {
   success?: boolean
-  rows?: PersonalSevaRow[]
+  rows?: SpiritualSevaRow[]
   pageSize?: number
   nextCursor?: number | null
   prevCursor?: number | null
@@ -74,7 +74,7 @@ type FilterState = {
   submittedTo: string
 }
 
-type AdminPersonalSevaTableProps = {
+type AdminSpiritualSevaTableProps = {
   initialTotalCount?: number | null
 }
 
@@ -117,13 +117,13 @@ function hasActiveFilters(filters: FilterState): boolean {
   )
 }
 
-export function AdminPersonalSevaTable({
+export function AdminSpiritualSevaTable({
   initialTotalCount = null,
-}: AdminPersonalSevaTableProps) {
+}: AdminSpiritualSevaTableProps) {
   const [loaded, setLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [rows, setRows] = useState<PersonalSevaRow[]>([])
+  const [rows, setRows] = useState<SpiritualSevaRow[]>([])
   const [pageSize, setPageSize] = useState<25 | 50 | 100>(25)
   const [nextCursor, setNextCursor] = useState<number | null>(null)
   const [prevCursor, setPrevCursor] = useState<number | null>(null)
@@ -173,7 +173,7 @@ export function AdminPersonalSevaTable({
 
   const fetchDistinctValues = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/personal-seva-submissions/distinct")
+      const response = await fetch("/api/admin/spiritual-seva-submissions/distinct")
       const data: DistinctValuesResponse = await response.json()
       if (response.ok) setDistinctValues(data)
     } catch {
@@ -186,7 +186,7 @@ export function AdminPersonalSevaTable({
     try {
       const params = buildFilterParams().toString()
       const response = await fetch(
-        `/api/admin/personal-seva-submissions/count${params ? `?${params}` : ""}`
+        `/api/admin/spiritual-seva-submissions/count${params ? `?${params}` : ""}`
       )
       const data = await response.json()
       if (requestId !== countRequestIdRef.current) return
@@ -234,7 +234,7 @@ export function AdminPersonalSevaTable({
         setLoading(true)
         setError(null)
         const response = await fetch(
-          `/api/admin/personal-seva-submissions?${buildParams(
+          `/api/admin/spiritual-seva-submissions?${buildParams(
             cursor,
             direction,
             pageSizeOverride
@@ -337,7 +337,7 @@ export function AdminPersonalSevaTable({
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  const columns: AdminDataTableColumn<PersonalSevaRow>[] = [
+  const columns: AdminDataTableColumn<SpiritualSevaRow>[] = [
     {
       key: "submitted",
       header: "Submitted",
@@ -448,7 +448,7 @@ export function AdminPersonalSevaTable({
           ) : (
             <Table2 className="size-5 text-[rgb(13,19,45)]" aria-hidden />
           )}
-          Personal Seva Submissions
+          Spiritual Seva Submissions
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           {loaded ? (
@@ -468,10 +468,10 @@ export function AdminPersonalSevaTable({
             </select>
           ) : null}
           <a
-            href="/api/admin/personal-seva-submissions/export"
+            href="/api/admin/spiritual-seva-submissions/export"
             download
             className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-medium admin-btn-outline text-sm border-2 border-[rgb(254,215,170)]"
-            aria-label="Export all personal seva submissions as CSV"
+            aria-label="Export all spiritual seva submissions as CSV"
           >
             <Download className="size-4" aria-hidden />
             Export all
@@ -490,7 +490,7 @@ export function AdminPersonalSevaTable({
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
                 className={`${INPUT_STYLE} w-full pl-10 pr-10`}
-                aria-label="Search personal seva submissions"
+                aria-label="Search spiritual seva submissions"
               />
               {searchInput ? (
                 <button
@@ -558,10 +558,10 @@ export function AdminPersonalSevaTable({
                   Clear filters
                 </Button>
                 <a
-                  href={`/api/admin/personal-seva-submissions/export?${activeFilterString}`}
+                  href={`/api/admin/spiritual-seva-submissions/export?${activeFilterString}`}
                   download
                   className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium admin-btn-primary text-sm col-span-2 w-full sm:col-span-1 sm:w-auto sm:min-w-0 justify-center"
-                  aria-label="Export filtered personal seva submissions as CSV"
+                  aria-label="Export filtered spiritual seva submissions as CSV"
                 >
                   <Download className="size-4 shrink-0" aria-hidden />
                   Export current view
@@ -639,7 +639,7 @@ export function AdminPersonalSevaTable({
             className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium admin-btn-primary text-base shadow-md hover:shadow-lg transition-shadow"
           >
             <Table2 className="size-5" aria-hidden />
-            Load Personal Seva Submissions
+            Load Spiritual Seva Submissions
           </Button>
         </div>
       ) : null}
@@ -665,7 +665,7 @@ export function AdminPersonalSevaTable({
           startIndex={pageInfo.startIndex}
           loading={loading}
           minWidthClassName="min-w-[980px]"
-          emptyTitle="No personal seva submissions match your filters"
+          emptyTitle="No spiritual seva submissions match your filters"
           emptyDescription="Try adjusting your search or filters"
           emptyAction={
             <Button

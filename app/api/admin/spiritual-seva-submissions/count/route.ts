@@ -2,10 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
-  PERSONAL_SEVA_TABLE,
-  applyPersonalSevaFilters,
-  parsePersonalSevaFilters,
-} from "@/lib/personal-seva-admin"
+  SPIRITUAL_SEVA_TABLE,
+  applySpiritualSevaFilters,
+  parseSpiritualSevaFilters,
+} from "@/lib/spiritual-seva-admin"
 
 export async function GET(request: Request) {
   const headers = new Headers()
@@ -40,12 +40,12 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const filters = parsePersonalSevaFilters(searchParams)
+  const filters = parseSpiritualSevaFilters(searchParams)
   let query = supabase
-    .from(PERSONAL_SEVA_TABLE)
+    .from(SPIRITUAL_SEVA_TABLE)
     .select("id", { count: "exact", head: true })
 
-  query = applyPersonalSevaFilters(query, filters)
+  query = applySpiritualSevaFilters(query, filters)
 
   const { count, error } = await query
 

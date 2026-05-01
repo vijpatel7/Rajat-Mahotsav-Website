@@ -1,5 +1,5 @@
 -- RLS Tightening: allow spiritual seva submissions SELECT for authenticated @nj.sgadi.us admins
--- Apply in Supabase before relying on /admin/personal-seva-submissions.
+-- Apply in Supabase before relying on /admin/spiritual-seva-submissions.
 -- Ref: security-rls-basics, security-rls-performance (wrap auth calls in SELECT for performance)
 
 -- Replace any prior version of this policy so the migration is safe to rerun.

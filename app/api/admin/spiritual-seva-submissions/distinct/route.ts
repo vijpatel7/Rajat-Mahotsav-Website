@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
-import { PERSONAL_SEVA_COLUMNS, PERSONAL_SEVA_TABLE } from "@/lib/personal-seva-admin"
+import { SPIRITUAL_SEVA_COLUMNS, SPIRITUAL_SEVA_TABLE } from "@/lib/spiritual-seva-admin"
 
 const RESPONSE_HEADERS = new Headers()
 RESPONSE_HEADERS.set("Cache-Control", "no-store, max-age=0")
@@ -47,8 +47,8 @@ export async function GET() {
   }
 
   const { data, error } = await supabase
-    .from(PERSONAL_SEVA_TABLE)
-    .select(PERSONAL_SEVA_COLUMNS.join(","))
+    .from(SPIRITUAL_SEVA_TABLE)
+    .select(SPIRITUAL_SEVA_COLUMNS.join(","))
     .order("id", { ascending: false })
     .limit(5000)
 

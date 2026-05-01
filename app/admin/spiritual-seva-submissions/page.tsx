@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
-import { PERSONAL_SEVA_TABLE } from "@/lib/personal-seva-admin"
+import { SPIRITUAL_SEVA_TABLE } from "@/lib/spiritual-seva-admin"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { AdminSignIn } from "../registrations/AdminSignIn"
-import { AdminPersonalSevaTable } from "./AdminPersonalSevaTable"
+import { AdminSpiritualSevaTable } from "./AdminSpiritualSevaTable"
 
 export const dynamic = "force-dynamic"
 
-export default async function AdminPersonalSevaSubmissionsPage() {
+export default async function AdminSpiritualSevaSubmissionsPage() {
   let supabase
   try {
     supabase = await createClient()
@@ -38,17 +38,17 @@ export default async function AdminPersonalSevaSubmissionsPage() {
     }
 
     const { count } = await supabase
-      .from(PERSONAL_SEVA_TABLE)
+      .from(SPIRITUAL_SEVA_TABLE)
       .select("id", { count: "exact", head: true })
 
     return (
       <div className="page-bg-extend reg-page-bg min-h-screen">
         <div className="container mx-auto px-4 page-bottom-spacing max-w-6xl">
           <StandardPageHeader
-            title="Personal Seva Submissions"
-            description="Secret admin view for reviewing spiritual personal seva entries and exporting the latest results."
+            title="Spiritual Seva Submissions"
+            description="Secret admin view for reviewing spiritual seva entries and exporting the latest results."
           />
-          <AdminPersonalSevaTable initialTotalCount={count ?? null} />
+          <AdminSpiritualSevaTable initialTotalCount={count ?? null} />
         </div>
       </div>
     )
@@ -59,10 +59,10 @@ export default async function AdminPersonalSevaSubmissionsPage() {
       <div className="container mx-auto px-4 page-bottom-spacing max-w-6xl">
         <StandardPageHeader
           title="Admin Access"
-          description="Sign in with your @nj.sgadi.us Google account to view personal seva submissions."
+          description="Sign in with your @nj.sgadi.us Google account to view spiritual seva submissions."
         />
         <div className="mt-12 flex justify-center">
-          <AdminSignIn nextPath="/admin/personal-seva-submissions" />
+          <AdminSignIn nextPath="/admin/spiritual-seva-submissions" />
         </div>
       </div>
     </div>

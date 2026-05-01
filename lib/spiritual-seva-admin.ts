@@ -1,4 +1,4 @@
-export const PERSONAL_SEVA_COLUMNS = [
+export const SPIRITUAL_SEVA_COLUMNS = [
   "id",
   "created_at",
   "first_name",
@@ -20,12 +20,12 @@ export const PERSONAL_SEVA_COLUMNS = [
   "upvas",
 ] as const
 
-export const PERSONAL_SEVA_TABLE = "spiritual_seva_submission"
+export const SPIRITUAL_SEVA_TABLE = "spiritual_seva_submission"
 
-export type PersonalSevaColumn = (typeof PERSONAL_SEVA_COLUMNS)[number]
-export type PersonalSevaRow = Record<PersonalSevaColumn, unknown>
+export type SpiritualSevaColumn = (typeof SPIRITUAL_SEVA_COLUMNS)[number]
+export type SpiritualSevaRow = Record<SpiritualSevaColumn, unknown>
 
-export type PersonalSevaFilters = {
+export type SpiritualSevaFilters = {
   search: string | null
   country: string | null
   mandal: string | null
@@ -35,12 +35,12 @@ export type PersonalSevaFilters = {
 }
 
 const PAGE_SIZES = [25, 50, 100] as const
-export type PersonalSevaPageSize = (typeof PAGE_SIZES)[number]
+export type SpiritualSevaPageSize = (typeof PAGE_SIZES)[number]
 
-export function parsePersonalSevaPageSize(value: string | null): PersonalSevaPageSize {
+export function parseSpiritualSevaPageSize(value: string | null): SpiritualSevaPageSize {
   const parsed = value ? Number.parseInt(value, 10) : 25
-  return PAGE_SIZES.includes(parsed as PersonalSevaPageSize)
-    ? (parsed as PersonalSevaPageSize)
+  return PAGE_SIZES.includes(parsed as SpiritualSevaPageSize)
+    ? (parsed as SpiritualSevaPageSize)
     : 25
 }
 
@@ -50,7 +50,7 @@ function parseOptionalDate(value: string | null): string | null {
   return Number.isNaN(date.getTime()) ? null : value.trim()
 }
 
-export function parsePersonalSevaFilters(searchParams: URLSearchParams): PersonalSevaFilters {
+export function parseSpiritualSevaFilters(searchParams: URLSearchParams): SpiritualSevaFilters {
   const searchRaw = searchParams.get("search")?.trim() || null
 
   return {
@@ -63,9 +63,9 @@ export function parsePersonalSevaFilters(searchParams: URLSearchParams): Persona
   }
 }
 
-export function applyPersonalSevaFilters<Query>(
+export function applySpiritualSevaFilters<Query>(
   query: Query,
-  filters: PersonalSevaFilters
+  filters: SpiritualSevaFilters
 ): Query {
   let nextQuery = query as any
 
@@ -95,7 +95,7 @@ export function applyPersonalSevaFilters<Query>(
   return nextQuery as Query
 }
 
-export function hasPersonalSevaFilters(filters: PersonalSevaFilters): boolean {
+export function hasSpiritualSevaFilters(filters: SpiritualSevaFilters): boolean {
   return !!(
     filters.search ||
     filters.country ||
@@ -106,17 +106,17 @@ export function hasPersonalSevaFilters(filters: PersonalSevaFilters): boolean {
   )
 }
 
-export function buildPersonalSevaQuery(
+export function buildSpiritualSevaQuery(
   supabase: any,
-  filters: PersonalSevaFilters,
-  columns = PERSONAL_SEVA_COLUMNS.join(","),
+  filters: SpiritualSevaFilters,
+  columns = SPIRITUAL_SEVA_COLUMNS.join(","),
   count = false
 ) {
   const query = supabase
-    .from(PERSONAL_SEVA_TABLE)
+    .from(SPIRITUAL_SEVA_TABLE)
     .select(columns, count ? { count: "exact" } : undefined)
 
-  return applyPersonalSevaFilters(query, filters)
+  return applySpiritualSevaFilters(query, filters)
 }
 
 export function escapeCsvField(value: unknown): string {
@@ -127,6 +127,6 @@ export function escapeCsvField(value: unknown): string {
   return s
 }
 
-export function personalSevaRowToCsvLine(row: PersonalSevaRow): string {
-  return PERSONAL_SEVA_COLUMNS.map((col) => escapeCsvField(row[col])).join(",")
+export function spiritualSevaRowToCsvLine(row: SpiritualSevaRow): string {
+  return SPIRITUAL_SEVA_COLUMNS.map((col) => escapeCsvField(row[col])).join(",")
 }
