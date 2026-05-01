@@ -5,15 +5,29 @@ import { supabase } from "@/utils/supabase/client"
 import { Button } from "@/components/atoms/button"
 import { Loader2 } from "lucide-react"
 
-export function AdminSignIn() {
+type AdminSignInProps = {
+  nextPath?: string
+}
+
+function sanitizeNextPath(value: string): string {
+  if (!value.startsWith("/") || value.includes("//") || value.includes(":")) {
+    return "/admin/registrations"
+  }
+
+  return value
+}
+
+export function AdminSignIn({ nextPath }: AdminSignInProps) {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
     try {
-      const nextPath = "/admin/registrations"
+      const returnPath = sanitizeNextPath(
+        nextPath ?? `${window.location.pathname}${window.location.search}`
+      )
       const cookieParts = [
-        `rm-auth-next=${encodeURIComponent(nextPath)}`,
+        `rm-auth-next=${encodeURIComponent(returnPath)}`,
         "Path=/",
         "Max-Age=600",
         "SameSite=Lax",

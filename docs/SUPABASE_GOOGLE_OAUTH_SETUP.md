@@ -1,6 +1,7 @@
 # Supabase Google OAuth Setup
 
-This guide configures Google OAuth for the admin dashboard at `/admin/registrations`.
+This guide configures Google OAuth for the admin dashboard at `/admin/registrations`
+and related gated admin pages.
 
 ## 1. Supabase Dashboard – Enable Google Provider
 
@@ -35,10 +36,10 @@ This guide configures Google OAuth for the admin dashboard at `/admin/registrati
 ## 4. Verification
 
 1. Start the app: `npm run dev`.
-2. Visit `/admin/registrations` (or a page with a Google sign-in button).
+2. Visit `/admin/registrations`, `/admin/personal-seva-submissions`, or another gated admin page.
 3. Click **Sign in with Google**.
 4. Complete the Google consent flow.
-5. You should be redirected back with a Supabase session (cookies set).
+5. You should be redirected back to the admin page where you started, with a Supabase session (cookies set).
 6. In DevTools → Application → Cookies, confirm `sb-*-auth-token` cookies are present.
 
 ## Environment Variables

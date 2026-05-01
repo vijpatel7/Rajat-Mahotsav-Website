@@ -61,7 +61,7 @@ export default async function AdminPersonalSevaSubmissionsPage() {
           description="Sign in with your @nj.sgadi.us Google account to view personal seva submissions."
         />
         <div className="mt-12 flex justify-center">
-          <AdminSignIn />
+          <AdminSignIn nextPath="/admin/personal-seva-submissions" />
         </div>
       </div>
     </div>
