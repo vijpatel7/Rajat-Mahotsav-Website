@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Table2,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
   Download,
   Search,
   Filter,
@@ -18,6 +16,10 @@ import { mandalStoredToDisplay, getAllMandalOptionsStored } from "@/lib/mandal-o
 import { Button } from "@/components/atoms/button"
 import { format } from "date-fns"
 import { REGISTRATION_DATE_RANGE } from "@/lib/registration-date-range"
+import {
+  AdminDataTable,
+  type AdminDataTableColumn,
+} from "@/app/admin/components/AdminDataTable"
 
 // Track the current page number for row numbering
 type PageInfo = {
@@ -147,7 +149,6 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasLoadedOnceRef = useRef(false)
   const mandalOptions = getAllMandalOptionsStored()
-  const tableContainerRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
   const requestIdRef = useRef(0)
   const countRequestIdRef = useRef(0)
@@ -403,6 +404,51 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
+
+  const columns: AdminDataTableColumn<RegistrationRow>[] = [
+    {
+      key: "name",
+      header: "Name",
+      cellClassName: "py-2.5 px-3 reg-text-primary font-medium",
+      render: (row) =>
+        [row.first_name, row.middle_name, row.last_name].filter(Boolean).join(" ") ||
+        "—",
+    },
+    {
+      key: "email",
+      header: "Email",
+      cellClassName: "py-2.5 px-3 reg-text-primary truncate max-w-[160px]",
+      render: (row) => row.email ?? "—",
+    },
+    {
+      key: "ghaam",
+      header: "Ghaam",
+      render: (row) => row.ghaam ?? "—",
+    },
+    {
+      key: "mandal",
+      header: "Mandal",
+      render: (row) => mandalStoredToDisplay(row.mandal),
+    },
+    {
+      key: "arrival",
+      header: "Arrival",
+      cellClassName: "py-2.5 px-3 reg-text-secondary tabular-nums text-xs",
+      render: (row) => formatDate(row.arrival_date),
+    },
+    {
+      key: "departure",
+      header: "Departure",
+      cellClassName: "py-2.5 px-3 reg-text-secondary tabular-nums text-xs",
+      render: (row) => formatDate(row.departure_date),
+    },
+    {
+      key: "age",
+      header: "Age",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => row.age ?? "—",
+    },
+  ]
 
   return (
     <motion.div
@@ -722,168 +768,40 @@ export function AdminRegistrationsTable({ initialTotalCount = null }: AdminRegis
         </div>
       )}
 
-      {/* Table with fixed height container to prevent layout shift */}
       {loaded && (
-        <div ref={tableContainerRef} className="relative min-h-[400px] p-5">
-          {/* Loading overlay - shows on top of existing content */}
-          <AnimatePresence>
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-10 flex items-center justify-center"
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="size-8 animate-spin text-orange-500" aria-hidden />
-                  <span className="text-sm reg-text-secondary">Loading…</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {rows.length > 0 ? (
+        <AdminDataTable
+          rows={rows}
+          columns={columns}
+          getRowKey={(row) => row.id}
+          startIndex={pageInfo.startIndex}
+          loading={loading}
+          emptyTitle="No registrations match your filters"
+          emptyDescription="Try adjusting your search or filters"
+          emptyAction={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearFilters}
+              className="rounded-full px-5 py-2.5 admin-btn-outline"
+            >
+              Clear filters
+            </Button>
+          }
+          totalRowsLabel={
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-[rgb(254,215,170)]">
-                      <th className="text-center py-3 px-2 font-semibold reg-text-secondary w-12">
-                        #
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Name
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Email
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Ghaam
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Mandal
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Arrival
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Departure
-                      </th>
-                      <th className="text-left py-3 px-3 font-semibold reg-text-primary">
-                        Age
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, index) => (
-                      <tr
-                        key={row.id}
-                        className={`border-b border-[rgb(254,215,170)]/40 transition-colors ${
-                          index % 2 === 0 
-                            ? "bg-white" 
-                            : "bg-orange-100/70"
-                        } hover:bg-orange-200/60`}
-                      >
-                        <td className="py-2.5 px-2 text-center text-xs font-medium reg-text-secondary tabular-nums">
-                          {pageInfo.startIndex + index}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-primary font-medium">
-                          {[row.first_name, row.middle_name, row.last_name]
-                            .filter(Boolean)
-                            .join(" ") || "—"}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-primary truncate max-w-[160px]">
-                          {row.email ?? "—"}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-primary">
-                          {row.ghaam ?? "—"}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-primary">
-                          {mandalStoredToDisplay(row.mandal)}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-secondary tabular-nums text-xs">
-                          {formatDate(row.arrival_date)}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-secondary tabular-nums text-xs">
-                          {formatDate(row.departure_date)}
-                        </td>
-                        <td className="py-2.5 px-3 reg-text-primary tabular-nums text-center">
-                          {row.age ?? "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination footer */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 pt-4 border-t-2 border-[rgb(254,215,170)]">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                  <p className="text-sm reg-text-secondary">
-                    Showing rows {pageInfo.startIndex}–{pageInfo.startIndex + rows.length - 1}
-                  </p>
-                  <p className="text-sm reg-text-secondary">
-                    Total rows: {hasActiveFilters(filters) ? (totalCount != null ? totalCount : "—") : (initialTotalCount ?? totalCount ?? "—")}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handlePrev}
-                    disabled={isOnFirstPage || loading}
-                    className={`
-                      inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium
-                      transition-all duration-200
-                      ${!isOnFirstPage && !loading
-                        ? "bg-white border-2 border-[rgb(254,215,170)] text-gray-700 hover:bg-orange-50 hover:border-orange-400 active:scale-95"
-                        : "bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed"
-                      }
-                    `}
-                    aria-label="Previous page"
-                  >
-                    <ChevronLeft className="size-4" aria-hidden />
-                    <span>Prev</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    disabled={!hasMore || loading}
-                    className={`
-                      inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium
-                      transition-all duration-200
-                      ${hasMore && !loading
-                        ? "bg-white border-2 border-[rgb(254,215,170)] text-gray-700 hover:bg-orange-50 hover:border-orange-400 active:scale-95"
-                        : "bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed"
-                      }
-                    `}
-                    aria-label="Next page"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="size-4" aria-hidden />
-                  </button>
-                </div>
-              </div>
+              Total rows:{" "}
+              {hasActiveFilters(filters)
+                ? totalCount != null
+                  ? totalCount
+                  : "—"
+                : initialTotalCount ?? totalCount ?? "—"}
             </>
-          ) : !loading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="reg-text-primary font-medium mb-2">
-                No registrations match your filters
-              </p>
-              <p className="text-sm reg-text-secondary mb-4">
-                Try adjusting your search or filters
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-                className="rounded-full px-5 py-2.5 admin-btn-outline"
-              >
-                Clear filters
-              </Button>
-            </div>
-          ) : null}
-        </div>
+          }
+          hasPrev={!isOnFirstPage}
+          hasMore={hasMore}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
       )}
     </motion.div>
   )
