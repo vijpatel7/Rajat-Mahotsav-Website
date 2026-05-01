@@ -2,12 +2,13 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
-  PERSONAL_SEVA_COLUMNS,
-  type PersonalSevaRow,
-  applyPersonalSevaFilters,
-  parsePersonalSevaFilters,
-  parsePersonalSevaPageSize,
-} from "@/lib/personal-seva-admin"
+  SPIRITUAL_SEVA_COLUMNS,
+  SPIRITUAL_SEVA_TABLE,
+  type SpiritualSevaRow,
+  applySpiritualSevaFilters,
+  parseSpiritualSevaFilters,
+  parseSpiritualSevaPageSize,
+} from "@/lib/spiritual-seva-admin"
 
 export async function GET(request: Request) {
   const headers = new Headers()
@@ -42,18 +43,18 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const pageSize = parsePersonalSevaPageSize(searchParams.get("page_size"))
+  const pageSize = parseSpiritualSevaPageSize(searchParams.get("page_size"))
   const cursorRaw = searchParams.get("cursor")
   const cursor = cursorRaw ? Number.parseInt(cursorRaw, 10) : null
   const direction = searchParams.get("direction") === "prev" ? "prev" : "next"
-  const filters = parsePersonalSevaFilters(searchParams)
+  const filters = parseSpiritualSevaFilters(searchParams)
 
   const fetchLimit = pageSize + 1
   let query = supabase
-    .from("personal_seva_submission")
-    .select(PERSONAL_SEVA_COLUMNS.join(","))
+    .from(SPIRITUAL_SEVA_TABLE)
+    .select(SPIRITUAL_SEVA_COLUMNS.join(","))
 
-  query = applyPersonalSevaFilters(query, filters)
+  query = applySpiritualSevaFilters(query, filters)
 
   if (cursor != null && !Number.isNaN(cursor)) {
     query = direction === "prev" ? query.gt("id", cursor) : query.lt("id", cursor)
@@ -73,7 +74,7 @@ export async function GET(request: Request) {
     )
   }
 
-  const fetchedRows = ((data ?? []) as unknown) as PersonalSevaRow[]
+  const fetchedRows = ((data ?? []) as unknown) as SpiritualSevaRow[]
   const hasExtraRow = fetchedRows.length > pageSize
   const pageRows =
     direction === "prev"

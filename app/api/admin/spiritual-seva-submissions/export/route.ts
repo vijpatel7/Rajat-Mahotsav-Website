@@ -2,13 +2,14 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
 import {
-  PERSONAL_SEVA_COLUMNS,
-  applyPersonalSevaFilters,
-  hasPersonalSevaFilters,
-  parsePersonalSevaFilters,
-  personalSevaRowToCsvLine,
-  type PersonalSevaRow,
-} from "@/lib/personal-seva-admin"
+  SPIRITUAL_SEVA_COLUMNS,
+  SPIRITUAL_SEVA_TABLE,
+  applySpiritualSevaFilters,
+  hasSpiritualSevaFilters,
+  parseSpiritualSevaFilters,
+  spiritualSevaRowToCsvLine,
+  type SpiritualSevaRow,
+} from "@/lib/spiritual-seva-admin"
 
 const CHUNK_SIZE = 500
 
@@ -45,12 +46,12 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const filters = parsePersonalSevaFilters(searchParams)
-  const hasFilters = hasPersonalSevaFilters(filters)
+  const filters = parseSpiritualSevaFilters(searchParams)
+  const hasFilters = hasSpiritualSevaFilters(filters)
 
   const baseName = hasFilters
-    ? "personal-seva-submissions-filtered"
-    : "personal-seva-submissions"
+    ? "spiritual-seva-submissions-filtered"
+    : "spiritual-seva-submissions"
   const filename = `${baseName}-${new Date()
     .toISOString()
     .replace(/[:.]/g, "-")
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       controller.enqueue(encoder.encode("\uFEFF"))
-      controller.enqueue(encoder.encode(PERSONAL_SEVA_COLUMNS.join(",") + "\n"))
+      controller.enqueue(encoder.encode(SPIRITUAL_SEVA_COLUMNS.join(",") + "\n"))
 
       let from = 0
       let hasMore = true
@@ -71,10 +72,10 @@ export async function GET(request: Request) {
       while (hasMore) {
         const to = from + CHUNK_SIZE - 1
         let query = supabase
-          .from("personal_seva_submission")
-          .select(PERSONAL_SEVA_COLUMNS.join(","))
+          .from(SPIRITUAL_SEVA_TABLE)
+          .select(SPIRITUAL_SEVA_COLUMNS.join(","))
 
-        query = applyPersonalSevaFilters(query, filters)
+        query = applySpiritualSevaFilters(query, filters)
 
         const { data, error } = await query
           .order("id", { ascending: false })
@@ -85,10 +86,10 @@ export async function GET(request: Request) {
           return
         }
 
-        const rows = (data ?? []) as unknown as PersonalSevaRow[]
+        const rows = (data ?? []) as unknown as SpiritualSevaRow[]
         if (rows.length > 0) {
           controller.enqueue(
-            encoder.encode(rows.map(personalSevaRowToCsvLine).join("\n") + "\n")
+            encoder.encode(rows.map(spiritualSevaRowToCsvLine).join("\n") + "\n")
           )
         }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { isAdminDomainUser } from "@/lib/admin-auth"
-import { PERSONAL_SEVA_COLUMNS } from "@/lib/personal-seva-admin"
+import { SPIRITUAL_SEVA_COLUMNS, SPIRITUAL_SEVA_TABLE } from "@/lib/spiritual-seva-admin"
 
 const RESPONSE_HEADERS = new Headers()
 RESPONSE_HEADERS.set("Cache-Control", "no-store, max-age=0")
@@ -47,8 +47,8 @@ export async function GET() {
   }
 
   const { data, error } = await supabase
-    .from("personal_seva_submission")
-    .select(PERSONAL_SEVA_COLUMNS.join(","))
+    .from(SPIRITUAL_SEVA_TABLE)
+    .select(SPIRITUAL_SEVA_COLUMNS.join(","))
     .order("id", { ascending: false })
     .limit(5000)
 
@@ -64,7 +64,7 @@ export async function GET() {
       | {
           country?: unknown
           mandal?: unknown
-          activity_name?: unknown
+          ghaam?: unknown
         }[]
       | null) ?? []
 
@@ -73,7 +73,7 @@ export async function GET() {
       success: true,
       country: uniqueSorted(rows.map((row) => row.country)),
       mandal: uniqueSorted(rows.map((row) => row.mandal)),
-      activity: uniqueSorted(rows.map((row) => row.activity_name)),
+      ghaam: uniqueSorted(rows.map((row) => row.ghaam)),
     },
     { status: 200, headers: RESPONSE_HEADERS }
   )

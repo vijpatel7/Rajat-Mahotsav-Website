@@ -24,23 +24,31 @@ type PageInfo = {
   startIndex: number
 }
 
-type PersonalSevaRow = {
+type SpiritualSevaRow = {
   id: number
   created_at: string | null
   first_name: string | null
+  middle_name: string | null
   last_name: string | null
+  ghaam: string | null
+  phone_country_code: string | null
   mobile_number: string | null
   country: string | null
   mandal: string | null
-  activity_name: string | null
-  volunteer_hours: number | null
-  images_uploaded: boolean | null
-  images_path: string | null
+  malas: number | null
+  dhyan: number | null
+  pradakshinas: number | null
+  dandvats: number | null
+  padyatras: number | null
+  sadachar: number | null
+  harignanamrut: number | null
+  bapashree: number | null
+  upvas: number | null
 }
 
 type PaginatedResponse = {
   success?: boolean
-  rows?: PersonalSevaRow[]
+  rows?: SpiritualSevaRow[]
   pageSize?: number
   nextCursor?: number | null
   prevCursor?: number | null
@@ -54,22 +62,19 @@ type DistinctValuesResponse = {
   success?: boolean
   country?: string[]
   mandal?: string[]
-  activity?: string[]
+  ghaam?: string[]
 }
 
 type FilterState = {
   search: string
   country: string
   mandal: string
-  activity: string
+  ghaam: string
   submittedFrom: string
   submittedTo: string
-  hoursMin: number | null
-  hoursMax: number | null
-  imagesUploaded: "" | "true" | "false"
 }
 
-type AdminPersonalSevaTableProps = {
+type AdminSpiritualSevaTableProps = {
   initialTotalCount?: number | null
 }
 
@@ -79,12 +84,9 @@ const INITIAL_FILTERS: FilterState = {
   search: "",
   country: "",
   mandal: "",
-  activity: "",
+  ghaam: "",
   submittedFrom: "",
   submittedTo: "",
-  hoursMin: null,
-  hoursMax: null,
-  imagesUploaded: "",
 }
 
 const SELECT_STYLE =
@@ -99,9 +101,9 @@ function formatSubmittedAt(value: string | null): string {
   return format(date, "MMM d, yyyy h:mm a")
 }
 
-function formatHours(value: number | null): string {
+function formatCount(value: number | null): string {
   if (value == null) return "-"
-  return Number.isInteger(value) ? String(value) : value.toFixed(1)
+  return String(value)
 }
 
 function hasActiveFilters(filters: FilterState): boolean {
@@ -109,22 +111,19 @@ function hasActiveFilters(filters: FilterState): boolean {
     filters.search ||
     filters.country ||
     filters.mandal ||
-    filters.activity ||
+    filters.ghaam ||
     filters.submittedFrom ||
-    filters.submittedTo ||
-    filters.hoursMin != null ||
-    filters.hoursMax != null ||
-    filters.imagesUploaded
+    filters.submittedTo
   )
 }
 
-export function AdminPersonalSevaTable({
+export function AdminSpiritualSevaTable({
   initialTotalCount = null,
-}: AdminPersonalSevaTableProps) {
+}: AdminSpiritualSevaTableProps) {
   const [loaded, setLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [rows, setRows] = useState<PersonalSevaRow[]>([])
+  const [rows, setRows] = useState<SpiritualSevaRow[]>([])
   const [pageSize, setPageSize] = useState<25 | 50 | 100>(25)
   const [nextCursor, setNextCursor] = useState<number | null>(null)
   const [prevCursor, setPrevCursor] = useState<number | null>(null)
@@ -149,16 +148,11 @@ export function AdminPersonalSevaTable({
     }
     if (filters.country) params.set("country", filters.country)
     if (filters.mandal) params.set("mandal", filters.mandal)
-    if (filters.activity) params.set("activity", filters.activity)
+    if (filters.ghaam) params.set("ghaam", filters.ghaam)
     if (filters.submittedFrom) {
       params.set("submitted_from", filters.submittedFrom)
     }
     if (filters.submittedTo) params.set("submitted_to", filters.submittedTo)
-    if (filters.hoursMin != null) params.set("hours_min", String(filters.hoursMin))
-    if (filters.hoursMax != null) params.set("hours_max", String(filters.hoursMax))
-    if (filters.imagesUploaded) {
-      params.set("images_uploaded", filters.imagesUploaded)
-    }
     return params
   }, [filters])
 
@@ -179,7 +173,7 @@ export function AdminPersonalSevaTable({
 
   const fetchDistinctValues = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/personal-seva-submissions/distinct")
+      const response = await fetch("/api/admin/spiritual-seva-submissions/distinct")
       const data: DistinctValuesResponse = await response.json()
       if (response.ok) setDistinctValues(data)
     } catch {
@@ -192,7 +186,7 @@ export function AdminPersonalSevaTable({
     try {
       const params = buildFilterParams().toString()
       const response = await fetch(
-        `/api/admin/personal-seva-submissions/count${params ? `?${params}` : ""}`
+        `/api/admin/spiritual-seva-submissions/count${params ? `?${params}` : ""}`
       )
       const data = await response.json()
       if (requestId !== countRequestIdRef.current) return
@@ -240,7 +234,7 @@ export function AdminPersonalSevaTable({
         setLoading(true)
         setError(null)
         const response = await fetch(
-          `/api/admin/personal-seva-submissions?${buildParams(
+          `/api/admin/spiritual-seva-submissions?${buildParams(
             cursor,
             direction,
             pageSizeOverride
@@ -296,12 +290,9 @@ export function AdminPersonalSevaTable({
     filters.search,
     filters.country,
     filters.mandal,
-    filters.activity,
+    filters.ghaam,
     filters.submittedFrom,
     filters.submittedTo,
-    filters.hoursMin,
-    filters.hoursMax,
-    filters.imagesUploaded,
     fetchCount,
     fetchPage,
     initialTotalCount,
@@ -346,7 +337,7 @@ export function AdminPersonalSevaTable({
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  const columns: AdminDataTableColumn<PersonalSevaRow>[] = [
+  const columns: AdminDataTableColumn<SpiritualSevaRow>[] = [
     {
       key: "submitted",
       header: "Submitted",
@@ -357,13 +348,21 @@ export function AdminPersonalSevaTable({
       key: "name",
       header: "Name",
       cellClassName: "py-2.5 px-3 reg-text-primary font-medium",
-      render: (row) => [row.first_name, row.last_name].filter(Boolean).join(" ") || "-",
+      render: (row) =>
+        [row.first_name, row.middle_name, row.last_name].filter(Boolean).join(" ") ||
+        "-",
+    },
+    {
+      key: "ghaam",
+      header: "Ghaam",
+      render: (row) => row.ghaam ?? "-",
     },
     {
       key: "phone",
       header: "Phone",
       cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums",
-      render: (row) => row.mobile_number ?? "-",
+      render: (row) =>
+        [row.phone_country_code, row.mobile_number].filter(Boolean).join(" ") || "-",
     },
     {
       key: "country",
@@ -376,22 +375,58 @@ export function AdminPersonalSevaTable({
       render: (row) => mandalStoredToDisplay(row.mandal),
     },
     {
-      key: "activity",
-      header: "Activity",
-      cellClassName: "py-2.5 px-3 reg-text-primary max-w-[220px]",
-      render: (row) => row.activity_name ?? "-",
-    },
-    {
-      key: "hours",
-      header: "Hours",
+      key: "malas",
+      header: "Malas",
       cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
-      render: (row) => formatHours(row.volunteer_hours),
+      render: (row) => formatCount(row.malas),
     },
     {
-      key: "images",
-      header: "Images",
+      key: "dhyan",
+      header: "Dhyan",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => formatCount(row.dhyan),
+    },
+    {
+      key: "pradakshinas",
+      header: "Pradakshinas",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => formatCount(row.pradakshinas),
+    },
+    {
+      key: "dandvats",
+      header: "Dandvats",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => formatCount(row.dandvats),
+    },
+    {
+      key: "padyatras",
+      header: "Padyatras",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => formatCount(row.padyatras),
+    },
+    {
+      key: "sadachar",
+      header: "Sadachar",
       cellClassName: "py-2.5 px-3 reg-text-primary text-center",
-      render: (row) => (row.images_uploaded ? "Yes" : "No"),
+      render: (row) => formatCount(row.sadachar),
+    },
+    {
+      key: "harignanamrut",
+      header: "Harignanamrut",
+      cellClassName: "py-2.5 px-3 reg-text-primary text-center",
+      render: (row) => formatCount(row.harignanamrut),
+    },
+    {
+      key: "bapashree",
+      header: "Bapashree",
+      cellClassName: "py-2.5 px-3 reg-text-primary text-center",
+      render: (row) => formatCount(row.bapashree),
+    },
+    {
+      key: "upvas",
+      header: "Upvas",
+      cellClassName: "py-2.5 px-3 reg-text-primary text-center",
+      render: (row) => formatCount(row.upvas),
     },
   ]
 
@@ -413,7 +448,7 @@ export function AdminPersonalSevaTable({
           ) : (
             <Table2 className="size-5 text-[rgb(13,19,45)]" aria-hidden />
           )}
-          Personal Seva Submissions
+          Spiritual Seva Submissions
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           {loaded ? (
@@ -433,10 +468,10 @@ export function AdminPersonalSevaTable({
             </select>
           ) : null}
           <a
-            href="/api/admin/personal-seva-submissions/export"
+            href="/api/admin/spiritual-seva-submissions/export"
             download
             className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-medium admin-btn-outline text-sm border-2 border-[rgb(254,215,170)]"
-            aria-label="Export all personal seva submissions as CSV"
+            aria-label="Export all spiritual seva submissions as CSV"
           >
             <Download className="size-4" aria-hidden />
             Export all
@@ -451,11 +486,11 @@ export function AdminPersonalSevaTable({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 reg-text-secondary pointer-events-none" aria-hidden />
               <input
                 type="search"
-                placeholder="Search name, phone, activity..."
+                placeholder="Search name, phone, ghaam..."
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
                 className={`${INPUT_STYLE} w-full pl-10 pr-10`}
-                aria-label="Search personal seva submissions"
+                aria-label="Search spiritual seva submissions"
               />
               {searchInput ? (
                 <button
@@ -498,15 +533,15 @@ export function AdminPersonalSevaTable({
               ))}
             </select>
             <select
-              value={filters.activity}
-              onChange={(event) => updateFilter("activity", event.target.value)}
+              value={filters.ghaam}
+              onChange={(event) => updateFilter("ghaam", event.target.value)}
               className={`${SELECT_STYLE} col-span-2 w-full sm:col-span-1 sm:w-auto`}
-              aria-label="Filter by activity"
+              aria-label="Filter by ghaam"
             >
-              <option value="">All activities</option>
-              {(distinctValues?.activity ?? []).map((activity) => (
-                <option key={activity} value={activity}>
-                  {activity}
+              <option value="">All ghaams</option>
+              {(distinctValues?.ghaam ?? []).map((ghaam) => (
+                <option key={ghaam} value={ghaam}>
+                  {ghaam}
                 </option>
               ))}
             </select>
@@ -523,10 +558,10 @@ export function AdminPersonalSevaTable({
                   Clear filters
                 </Button>
                 <a
-                  href={`/api/admin/personal-seva-submissions/export?${activeFilterString}`}
+                  href={`/api/admin/spiritual-seva-submissions/export?${activeFilterString}`}
                   download
                   className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium admin-btn-primary text-sm col-span-2 w-full sm:col-span-1 sm:w-auto sm:min-w-0 justify-center"
-                  aria-label="Export filtered personal seva submissions as CSV"
+                  aria-label="Export filtered spiritual seva submissions as CSV"
                 >
                   <Download className="size-4 shrink-0" aria-hidden />
                   Export current view
@@ -544,12 +579,12 @@ export function AdminPersonalSevaTable({
             {filtersExpanded ? (
               <>
                 <ChevronUp className="size-4" />
-                Hide date, hour & image filters
+                Hide date filters
               </>
             ) : (
               <>
                 <ChevronDown className="size-4" />
-                Show date, hour & image filters
+                Show date filters
               </>
             )}
           </button>
@@ -590,67 +625,6 @@ export function AdminPersonalSevaTable({
                       className={`${INPUT_STYLE} w-36`}
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-preset-bluish-gray mb-1">
-                      Hours min
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      step={0.5}
-                      placeholder="-"
-                      value={filters.hoursMin ?? ""}
-                      onChange={(event) =>
-                        updateFilter(
-                          "hoursMin",
-                          event.target.value
-                            ? Number.parseFloat(event.target.value)
-                            : null
-                        )
-                      }
-                      className={`${INPUT_STYLE} w-28`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-preset-bluish-gray mb-1">
-                      Hours max
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      step={0.5}
-                      placeholder="-"
-                      value={filters.hoursMax ?? ""}
-                      onChange={(event) =>
-                        updateFilter(
-                          "hoursMax",
-                          event.target.value
-                            ? Number.parseFloat(event.target.value)
-                            : null
-                        )
-                      }
-                      className={`${INPUT_STYLE} w-28`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-preset-bluish-gray mb-1">
-                      Images
-                    </label>
-                    <select
-                      value={filters.imagesUploaded}
-                      onChange={(event) =>
-                        updateFilter(
-                          "imagesUploaded",
-                          event.target.value as "" | "true" | "false"
-                        )
-                      }
-                      className={`${SELECT_STYLE} w-36`}
-                    >
-                      <option value="">Any</option>
-                      <option value="true">Uploaded</option>
-                      <option value="false">No images</option>
-                    </select>
-                  </div>
                 </div>
               </motion.div>
             ) : null}
@@ -665,7 +639,7 @@ export function AdminPersonalSevaTable({
             className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium admin-btn-primary text-base shadow-md hover:shadow-lg transition-shadow"
           >
             <Table2 className="size-5" aria-hidden />
-            Load Personal Seva Submissions
+            Load Spiritual Seva Submissions
           </Button>
         </div>
       ) : null}
@@ -691,7 +665,7 @@ export function AdminPersonalSevaTable({
           startIndex={pageInfo.startIndex}
           loading={loading}
           minWidthClassName="min-w-[980px]"
-          emptyTitle="No personal seva submissions match your filters"
+          emptyTitle="No spiritual seva submissions match your filters"
           emptyDescription="Try adjusting your search or filters"
           emptyAction={
             <Button

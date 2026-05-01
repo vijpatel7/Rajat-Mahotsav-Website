@@ -36,7 +36,7 @@ and related gated admin pages.
 ## 4. Verification
 
 1. Start the app: `npm run dev`.
-2. Visit `/admin/registrations`, `/admin/personal-seva-submissions`, or another gated admin page.
+2. Visit `/admin/registrations`, `/admin/spiritual-seva-submissions`, or another gated admin page.
 3. Click **Sign in with Google**.
 4. Complete the Google consent flow.
 5. You should be redirected back to the admin page where you started, with a Supabase session (cookies set).
