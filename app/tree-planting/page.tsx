@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowUpRight, Leaf, Sprout, TreePine, Quote, Calendar, MapPin, Users } from "lucide-react"
+import LiteYouTube from "@/components/molecules/lite-youtube"
 
 /**
  * Tree Plantation Program — 25 Years of Roots
@@ -15,10 +16,12 @@ import { ArrowUpRight, Leaf, Sprout, TreePine, Quote, Calendar, MapPin, Users } 
  * pages.
  *
  * IMAGE PLACEHOLDERS:
- * The `placeholderImages` array below holds Unsplash filler photos. Swap each
- * `src` with a Cloudflare image (use `getCloudflareImage(id)` from
- * @/lib/cdn-assets) when the real photos are uploaded. Captions/credits can
- * stay or be updated.
+ * The `placeholderImages` map below holds local filler photos that live in
+ * `/public/tree-planting/`. They were sourced from Pexels and are licensed
+ * for free use. To use the temple's real photos, either:
+ *   1. Replace the files in `/public/tree-planting/` with same filenames, OR
+ *   2. Update each `src` below to a Cloudflare image URL via
+ *      `getCloudflareImage(id)` from `@/lib/cdn-assets`.
  *
  * VIDEO:
  * `youtubeId` points to the program recap. Replace if a different video is
@@ -34,49 +37,50 @@ type Placeholder = {
   credit?: string
 }
 
-// Filler images — replace these with Cloudflare image IDs once uploaded.
+// Filler images — local files in /public/tree-planting/.
+// Swap these with the temple's real photos when ready.
 const placeholderImages: Record<string, Placeholder> = {
   hero: {
-    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2400&q=80",
-    alt: "Volunteers planting saplings in a sunlit field",
-    caption: "Volunteers gather at sunrise to plant saplings.",
+    src: "/tree-planting/hero.jpg",
+    alt: "Hands cradling a young sapling",
+    caption: "A sapling cradled in earth-stained hands.",
   },
   story1: {
-    src: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1600&q=80",
-    alt: "A young sapling emerging from rich soil",
-    caption: "A sapling breaks the soil — a quiet beginning.",
+    src: "/tree-planting/story-1.jpg",
+    alt: "Seedlings sprouting from soil trays",
+    caption: "Seedlings, ready to be given a home.",
   },
   story2: {
-    src: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1600&q=80",
-    alt: "Hands cradling a young plant in soil",
-    caption: "Devotees prepare the earth with care and prayer.",
+    src: "/tree-planting/story-2.jpg",
+    alt: "Hands tending to a young sapling in soil",
+    caption: "Each sapling, planted with prayer.",
   },
   gallery1: {
-    src: "https://images.unsplash.com/photo-1574263867128-a3d5c1b1deae?auto=format&fit=crop&w=1400&q=80",
-    alt: "Family planting a tree together",
-    caption: "Three generations, one root system.",
+    src: "/tree-planting/gallery-1.jpg",
+    alt: "Volunteers planting trees together",
+    caption: "Hands in soil, hearts in service.",
   },
   gallery2: {
-    src: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1400&q=80",
-    alt: "Sunlight through young forest canopy",
+    src: "/tree-planting/gallery-2.jpg",
+    alt: "Sunlight filtering through tree canopy",
   },
   gallery3: {
-    src: "https://images.unsplash.com/photo-1508497185412-22ea30b5f8b1?auto=format&fit=crop&w=1400&q=80",
-    alt: "Children watering newly planted saplings",
-    caption: "The next generation tends what we plant today.",
+    src: "/tree-planting/gallery-3.jpg",
+    alt: "A solitary tree against open sky",
+    caption: "What grows from a single seed.",
   },
   gallery4: {
-    src: "https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?auto=format&fit=crop&w=1400&q=80",
-    alt: "Volunteers in conversation under a tree",
+    src: "/tree-planting/gallery-4.jpg",
+    alt: "Detail of green leaves",
   },
   gallery5: {
-    src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=80",
-    alt: "A canopy of mature trees catching late afternoon light",
+    src: "/tree-planting/gallery-5.jpg",
+    alt: "Aerial view of forest road cutting through evergreens",
     caption: "What we plant in 2026 will canopy our 50th.",
   },
   closing: {
-    src: "https://images.unsplash.com/photo-1473773508845-188df298d2d1?auto=format&fit=crop&w=2400&q=80",
-    alt: "Sun-dappled forest path",
+    src: "/tree-planting/closing.jpg",
+    alt: "Misty forest with light filtering through trees",
   },
 }
 
@@ -479,13 +483,9 @@ export default function TreePlantingPage() {
               className="relative overflow-hidden rounded-sm bg-[#0e1a10]"
               style={{ aspectRatio: "16 / 9" }}
             >
-              <iframe
-                src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
+              <LiteYouTube
+                videoId={youtubeId}
                 title="Tree Plantation Program — Recap"
-                frameBorder={0}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full"
               />
             </div>
           </motion.div>

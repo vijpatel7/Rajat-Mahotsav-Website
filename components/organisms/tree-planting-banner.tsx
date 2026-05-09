@@ -11,11 +11,10 @@ import { ArrowUpRight, Leaf, Play, Sprout } from "lucide-react"
  * verdant editorial aesthetic that contrasts with the surrounding sections
  * while staying cohesive with the temple's gold accent palette.
  *
- * The featured image is a placeholder. Replace `featuredImage` with a
- * Cloudflare image URL once the temple's photo is uploaded.
+ * The featured image is a placeholder file in /public/tree-planting/.
+ * Replace the file or update this path when the temple's photo is uploaded.
  */
-const featuredImage =
-  "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1800&q=80"
+const featuredImage = "/tree-planting/hero.jpg"
 
 export default function TreePlantingBanner() {
   return (
