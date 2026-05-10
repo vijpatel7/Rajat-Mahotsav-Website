@@ -341,7 +341,7 @@ export function AdminContentSubmissionsView({
               <Input
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search family, village, caption, contact…"
+                placeholder="Search family, ghaam, caption, contact…"
                 className="reg-input rounded-md pl-10"
                 aria-label="Search submissions"
               />
