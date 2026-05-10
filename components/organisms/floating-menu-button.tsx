@@ -3,19 +3,26 @@
 import { useState, useEffect, useRef } from "react"
 import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image, CalendarCheck, FileText, BookA } from "lucide-react"
+import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image, CalendarCheck, FileText, BookA, MapPinned, Camera } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { useRouter, usePathname } from "next/navigation"
 import { FloatingButton } from "../atoms/floating-button"
 
 const menuItems = [
   { icon: Home, label: "Home", href: "/" },
-  { icon: BookA, label: "About the Mahotsav", href: "/about" },
   { icon: ScrollText, label: "Timeline", href: "/timeline" },
-  { icon: ClipboardPen, label: "Registration", href: "/registration" },
-  { icon: FileText, label: "Invitation", href: "/invitation" },
-  { icon: Hotel, label: "Guest Services", href: "/guest-services" },
-  { icon: CalendarDays, label: "Schedule", href: "/schedule" },
+  {
+    icon: MapPinned,
+    label: "Attend",
+    href: "#",
+    subItems: [
+      { icon: BookA, label: "About the Mahotsav", href: "/about" },
+      { icon: ClipboardPen, label: "Registration", href: "/registration" },
+      { icon: FileText, label: "Invitation", href: "/invitation" },
+      { icon: CalendarDays, label: "Schedule", href: "/schedule" },
+      { icon: Hotel, label: "Guest Services", href: "/guest-services" },
+    ]
+  },
   {
     icon: PiHandsPraying,
     label: "Seva",
@@ -25,6 +32,7 @@ const menuItems = [
       { icon: PiHandsPraying, label: "Spiritual Seva", href: "/spiritual-seva" },
     ]
   },
+  { icon: Camera, label: "Share Memories", href: "/share-memories" },
   { icon: CalendarCheck, label: "Latest Events", href: "/latest-events" },
   { icon: Image, label: "Media", href: "/media" },
 ]
