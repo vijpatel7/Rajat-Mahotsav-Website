@@ -37,6 +37,7 @@ import {
   SPECIAL_COUNTRY_MANDALS,
 } from "@/lib/mandal-options"
 import "@/styles/registration-theme.css"
+import "@/styles/share-memories-theme.css"
 
 type UploadUrl = {
   url: string
@@ -291,9 +292,14 @@ export default function ShareMemoriesPage() {
   return (
     <>
       <div
-        className="min-h-[calc(100vh+200px)] w-full reg-page-bg page-bg-extend"
-        data-page="registration"
+        className="album-page page-bg-extend min-h-[calc(100vh+200px)] w-full"
+        data-page="share-memories"
       >
+        <CornerOrnament className="album-corner album-corner-tl" />
+        <CornerOrnament className="album-corner album-corner-tr" />
+        <CornerOrnament className="album-corner album-corner-bl" />
+        <CornerOrnament className="album-corner album-corner-br" />
+
         <div className="relative z-10 mx-auto max-w-7xl px-4 page-bottom-spacing sm:px-6 lg:px-8">
           {/* Hero */}
           <div className="text-center page-header-spacing">
@@ -307,12 +313,24 @@ export default function ShareMemoriesPage() {
             </motion.h1>
 
             <motion.div
-              className="mt-8 flex justify-center px-4"
+              className="album-title-flourish"
+              initial={{ opacity: 0, scaleX: 0.6 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+              aria-hidden
+            >
+              <span className="album-flourish-line" />
+              <FlourishGlyph />
+              <span className="album-flourish-line" />
+            </motion.div>
+
+            <motion.div
+              className="mt-6 flex justify-center px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             >
-              <p className="max-w-3xl text-center text-base leading-relaxed text-gray-600 md:text-lg">
+              <p className="max-w-3xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
                 Share your memories with NJ Mandir. Send us photos of yourself
                 or your family from past celebrations and events along with a
                 short story. When featured on our channels, we will display your
@@ -321,6 +339,8 @@ export default function ShareMemoriesPage() {
               </p>
             </motion.div>
           </div>
+
+          <SampleSubmission />
 
           {/* Form card */}
           <div className="mx-auto max-w-3xl">
@@ -332,7 +352,9 @@ export default function ShareMemoriesPage() {
             >
               <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-orange-200/30 via-white/20 to-red-200/30 opacity-40 blur-xl will-change-transform" />
               <div className="relative">
-                <Card className="reg-card relative overflow-hidden rounded-3xl">
+                <span className="album-tape album-tape-left" aria-hidden />
+                <span className="album-tape album-tape-right" aria-hidden />
+                <Card className="reg-card relative overflow-visible rounded-3xl">
                   <CardHeader className="pb-2 text-center lg:pb-4">
                     <CardTitle className="reg-text-primary text-xl font-semibold lg:text-2xl">
                       Submit a Memory
@@ -745,9 +767,231 @@ function SectionHeader({
 
 function Divider() {
   return (
-    <div
-      className="h-px w-full bg-gradient-to-r from-transparent via-orange-200 to-transparent"
+    <div className="album-divider" aria-hidden="true">
+      <span className="album-divider-line" />
+      <span className="album-divider-glyph">
+        <FlourishGlyph />
+      </span>
+      <span className="album-divider-line" />
+    </div>
+  )
+}
+
+function FlourishGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
-    />
+    >
+      {/* simple 8-petal lotus mandala */}
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M12 4 C13.4 6.4 13.4 7.6 12 9 C10.6 7.6 10.6 6.4 12 4 Z" />
+      <path d="M20 12 C17.6 13.4 16.4 13.4 15 12 C16.4 10.6 17.6 10.6 20 12 Z" />
+      <path d="M12 20 C10.6 17.6 10.6 16.4 12 15 C13.4 16.4 13.4 17.6 12 20 Z" />
+      <path d="M4 12 C6.4 10.6 7.6 10.6 9 12 C7.6 13.4 6.4 13.4 4 12 Z" />
+      <path d="M17.6 6.4 C16.6 8.2 15.8 8.8 14.1 9.9" opacity="0.55" />
+      <path d="M17.6 17.6 C15.8 16.6 15.2 15.8 14.1 14.1" opacity="0.55" />
+      <path d="M6.4 17.6 C7.4 15.8 8.2 15.2 9.9 14.1" opacity="0.55" />
+      <path d="M6.4 6.4 C8.2 7.4 8.8 8.2 9.9 9.9" opacity="0.55" />
+    </svg>
+  )
+}
+
+function SampleSubmission() {
+  return (
+    <motion.section
+      className="mx-auto mt-10 max-w-3xl px-2 sm:mt-14"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
+      aria-labelledby="sample-submission-heading"
+    >
+      <div
+        id="sample-submission-heading"
+        className="mb-5 flex items-center justify-center gap-3 text-[11px] uppercase tracking-[0.22em] text-orange-700 sm:text-xs"
+      >
+        <span className="album-flourish-line" />
+        How your memory will appear
+        <span className="album-flourish-line" />
+      </div>
+
+      <div className="relative rounded-2xl border border-orange-200 bg-white/85 p-5 shadow-md backdrop-blur-sm sm:p-7">
+        <span className="album-tape album-tape-left" aria-hidden />
+        <span className="album-tape album-tape-right" aria-hidden />
+
+        <SampleRow label="Family name">
+          <span className="text-base font-bold tracking-wide text-gray-900 sm:text-lg">
+            Vijay Kamlesh Patel
+          </span>
+        </SampleRow>
+
+        <SampleRow label="Ghaam">
+          <span className="text-sm text-gray-800 sm:text-base">Mokhasan</span>
+        </SampleRow>
+
+        <SampleRow label="Mandal">
+          <span className="text-sm text-gray-800 sm:text-base">New Jersey</span>
+        </SampleRow>
+
+        <SampleRow label="Photos">
+          <div className="flex flex-wrap gap-3">
+            <PlaceholderImage />
+            <PlaceholderImage variant="b" />
+          </div>
+        </SampleRow>
+
+        <SampleRow label="Your story">
+          <p className="text-sm italic leading-relaxed text-gray-700 sm:text-base">
+            “What a blessed evening at the Platinum Tula celebration here at NJ
+            Mandir. Prem Murti Bapa's divine presence filled every corner of the
+            mandir, and our family felt blessed beyond words. The kirtans, the
+            aarti, and Bapa's smile will stay with us forever. Jai
+            Swaminarayan.”
+          </p>
+        </SampleRow>
+      </div>
+
+      <p className="mt-3 text-center text-xs italic text-gray-500">
+        Sample only. Your submission will appear with the same fields, in this
+        same format.
+      </p>
+    </motion.section>
+  )
+}
+
+function SampleRow({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="grid grid-cols-[auto_1fr] items-start gap-3 border-b border-orange-100/70 py-3 last:border-b-0 sm:gap-5">
+      <div className="flex shrink-0 items-center gap-2 pt-1 sm:min-w-[140px]">
+        <span className="whitespace-nowrap rounded-md bg-orange-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-orange-700 ring-1 ring-orange-200 sm:text-xs">
+          {label}
+        </span>
+        <ArrowGlyph />
+      </div>
+      <div className="min-w-0">{children}</div>
+    </div>
+  )
+}
+
+function ArrowGlyph() {
+  return (
+    <svg
+      width="22"
+      height="14"
+      viewBox="0 0 22 14"
+      fill="none"
+      stroke="rgba(154,52,18,0.55)"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M 1 7 L 17 7" strokeDasharray="2 2.5" />
+      <path d="M 14 3 L 19 7 L 14 11" />
+    </svg>
+  )
+}
+
+function PlaceholderImage({ variant = "a" }: { variant?: "a" | "b" }) {
+  const isB = variant === "b"
+  return (
+    <div className="relative aspect-[4/3] w-28 shrink-0 overflow-hidden rounded-md border border-orange-200 bg-gradient-to-br from-orange-100 via-amber-100 to-orange-200 shadow-sm sm:w-32">
+      <svg
+        viewBox="0 0 100 75"
+        className="h-full w-full text-orange-400/70"
+        aria-hidden
+      >
+        <rect width="100" height="75" fill="rgb(255 237 213)" />
+        {!isB ? (
+          <>
+            <path
+              d="M 0 60 L 30 35 L 50 45 L 70 25 L 100 55 L 100 75 L 0 75 Z"
+              fill="currentColor"
+              opacity="0.5"
+            />
+            <circle cx="78" cy="18" r="6" fill="currentColor" opacity="0.65" />
+          </>
+        ) : (
+          <>
+            <rect
+              x="14"
+              y="22"
+              width="72"
+              height="42"
+              rx="4"
+              fill="currentColor"
+              opacity="0.45"
+            />
+            <circle cx="32" cy="40" r="4" fill="rgb(255 237 213)" />
+            <circle cx="50" cy="40" r="4" fill="rgb(255 237 213)" />
+            <circle cx="68" cy="40" r="4" fill="rgb(255 237 213)" />
+          </>
+        )}
+      </svg>
+      <div className="absolute bottom-1 right-1 rounded bg-white/80 px-1.5 py-0.5 text-[9px] font-medium tracking-wider text-orange-700">
+        photo {isB ? "2" : "1"}
+      </div>
+    </div>
+  )
+}
+
+function CornerOrnament({ className }: { className?: string }) {
+  // Stylized corner flourish with arcs and a small mandala bloom near the corner.
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 160 160"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {/* outer corner arc */}
+      <path d="M 4 70 Q 4 4 70 4" />
+      {/* inner corner arc */}
+      <path d="M 14 56 Q 14 14 56 14" opacity="0.7" />
+      {/* fading dotted accent toward the inside */}
+      <path d="M 28 42 Q 28 28 42 28" strokeDasharray="1 4" opacity="0.6" />
+      {/* corner anchor dot */}
+      <circle cx="6" cy="6" r="2.4" fill="currentColor" stroke="none" />
+      {/* small lotus bloom near the corner */}
+      <g transform="translate(34 34)">
+        <circle r="1.6" fill="currentColor" stroke="none" />
+        <path d="M 0 -8 C 1.4 -5.6 1.4 -4.4 0 -3 C -1.4 -4.4 -1.4 -5.6 0 -8 Z" />
+        <path d="M 8 0 C 5.6 1.4 4.4 1.4 3 0 C 4.4 -1.4 5.6 -1.4 8 0 Z" />
+        <path d="M 0 8 C -1.4 5.6 -1.4 4.4 0 3 C 1.4 4.4 1.4 5.6 0 8 Z" />
+        <path d="M -8 0 C -5.6 -1.4 -4.4 -1.4 -3 0 C -4.4 1.4 -5.6 1.4 -8 0 Z" />
+        <path d="M 5.6 -5.6 C 4.6 -3.8 3.8 -3.2 2.1 -2.1" opacity="0.6" />
+        <path d="M 5.6 5.6 C 3.8 4.6 3.2 3.8 2.1 2.1" opacity="0.6" />
+        <path d="M -5.6 5.6 C -4.6 3.8 -3.8 3.2 -2.1 2.1" opacity="0.6" />
+        <path d="M -5.6 -5.6 C -3.8 -4.6 -3.2 -3.8 -2.1 -2.1" opacity="0.6" />
+      </g>
+      {/* outer trailing line into the page */}
+      <path
+        d="M 80 8 Q 110 8 138 28"
+        strokeDasharray="1 5"
+        opacity="0.5"
+      />
+      <path
+        d="M 8 80 Q 8 110 28 138"
+        strokeDasharray="1 5"
+        opacity="0.5"
+      />
+    </svg>
   )
 }
