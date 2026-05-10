@@ -11,10 +11,9 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { format, formatDistanceToNow } from "date-fns"
 import {
-  ChevronLeft,
-  ChevronRight,
   Copy,
   Download,
+  Eye,
   ExternalLink,
   Filter,
   Loader2,
@@ -55,6 +54,10 @@ import {
 } from "@/lib/content-submissions-admin"
 import { mandalStoredToDisplay, getAllMandalOptionsStored } from "@/lib/mandal-options"
 import { formatBytes } from "@/lib/utils"
+import {
+  AdminDataTable,
+  type AdminDataTableColumn,
+} from "@/app/admin/components/AdminDataTable"
 
 const STATUS_LABEL: Record<ContentSubmissionStatus, string> = {
   new: "New",
@@ -329,6 +332,146 @@ export function AdminContentSubmissionsView({
     } of ${totalCount.toLocaleString()}`
   }, [rows.length, totalCount, pageStartIndex])
 
+  const archiveUrl = useMemo(() => {
+    const params = new URLSearchParams()
+    if (filters.search) params.set("search", filters.search)
+    if (filters.status) params.set("status", filters.status)
+    if (filters.mandal) params.set("mandal", filters.mandal)
+    if (filters.submittedFrom)
+      params.set("submittedFrom", filters.submittedFrom)
+    if (filters.submittedTo) params.set("submittedTo", filters.submittedTo)
+    const qs = params.toString()
+    return qs
+      ? `/api/admin/content-submissions/archive?${qs}`
+      : "/api/admin/content-submissions/archive"
+  }, [filters])
+
+  const tableColumns: AdminDataTableColumn<ContentSubmissionRow>[] = [
+    {
+      key: "thumbnail",
+      header: "",
+      className: "w-20 py-3 px-2",
+      cellClassName: "py-2 px-2",
+      render: (row) => {
+        const first = row.image_keys?.[0]
+        if (!first) {
+          return (
+            <div className="h-14 w-14 rounded-md bg-orange-50 ring-1 ring-orange-200" />
+          )
+        }
+        return (
+          <button
+            type="button"
+            onClick={() => setActiveRow(row)}
+            className="block h-14 w-14 overflow-hidden rounded-md ring-1 ring-orange-200 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            aria-label="View submission details"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={publicUrlForKey(first.key)}
+              alt={first.filename}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </button>
+        )
+      },
+    },
+    {
+      key: "family_name",
+      header: "Family Name",
+      render: (row) => (
+        <button
+          type="button"
+          onClick={() => setActiveRow(row)}
+          className="text-left font-semibold text-gray-900 hover:text-orange-700 hover:underline"
+        >
+          {row.family_name}
+        </button>
+      ),
+    },
+    {
+      key: "ghaam",
+      header: "Ghaam",
+      render: (row) => (
+        <span className="text-sm text-gray-700">{row.village}</span>
+      ),
+    },
+    {
+      key: "mandal",
+      header: "Mandal",
+      render: (row) => (
+        <span className="text-sm text-gray-700">
+          {mandalStoredToDisplay(row.mandal)}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      className: "w-28 text-left py-3 px-3 font-semibold reg-text-primary",
+      render: (row) => (
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ring-1 ${STATUS_PILL_CLASS[row.status]}`}
+        >
+          {STATUS_LABEL[row.status]}
+        </span>
+      ),
+    },
+    {
+      key: "photos",
+      header: "Photos",
+      className: "w-16 text-center py-3 px-2 font-semibold reg-text-primary",
+      cellClassName: "py-2.5 px-2 text-center text-sm tabular-nums",
+      render: (row) => row.image_keys?.length ?? 0,
+    },
+    {
+      key: "submitted",
+      header: "Submitted",
+      className: "w-32 text-left py-3 px-3 font-semibold reg-text-primary",
+      render: (row) =>
+        row.created_at ? (
+          <span
+            className="text-xs text-gray-600"
+            title={format(new Date(row.created_at), "MMM d, yyyy 'at' h:mm a")}
+          >
+            {formatDistanceToNow(new Date(row.created_at), {
+              addSuffix: true,
+            })}
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "actions",
+      header: "",
+      className: "w-28 text-right py-3 px-3 font-semibold reg-text-primary",
+      cellClassName: "py-2.5 px-3",
+      render: (row) => (
+        <div className="flex justify-end gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveRow(row)}
+            className="inline-flex size-8 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-300"
+            title="View details"
+            aria-label="View details"
+          >
+            <Eye className="size-4" />
+          </button>
+          <a
+            href={`/api/admin/content-submissions/${row.id}/zip`}
+            className="inline-flex size-8 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-300"
+            title="Download submission ZIP (data + photos)"
+            aria-label="Download submission ZIP"
+          >
+            <Download className="size-4" />
+          </a>
+        </div>
+      ),
+    },
+  ]
+
   return (
     <>
       <div className="mt-8 space-y-4">
@@ -372,6 +515,14 @@ export function AdminContentSubmissionsView({
                 Clear
               </Button>
             )}
+            <a
+              href={archiveUrl}
+              className="admin-btn-primary inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm"
+              title="Download CSV + all photos for the current filtered set"
+            >
+              <Download className="size-4" />
+              Export Archive
+            </a>
             <div className="ml-auto text-xs text-gray-600 sm:text-sm">
               {filteredCountLabel}
             </div>
@@ -483,75 +634,27 @@ export function AdminContentSubmissionsView({
           </AnimatePresence>
         </div>
 
-        {/* Cards grid */}
-        <div className="admin-card relative min-h-[400px] rounded-2xl p-4 sm:p-5">
-          <AnimatePresence>
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-[1px]"
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2
-                    className="size-8 animate-spin text-orange-500"
-                    aria-hidden
-                  />
-                  <span className="reg-text-secondary text-sm">Loading…</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {rows.length === 0 && !loading ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-              <p className="reg-text-primary text-base font-semibold">
-                No submissions yet
-              </p>
-              <p className="reg-text-secondary max-w-sm text-sm">
-                Once memories are submitted at /share-memories, they'll appear
-                here for review.
-              </p>
-            </div>
-          ) : (
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map((row) => (
-                <SubmissionCard
-                  key={row.id}
-                  row={row}
-                  onOpen={() => setActiveRow(row)}
-                />
-              ))}
-            </ul>
-          )}
-
-          {/* Pagination */}
-          {(hasMore || hasPrev) && (
-            <div className="mt-5 flex items-center justify-between border-t-2 border-orange-200/60 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!hasPrev || loading}
-                onClick={goPrev}
-                className="admin-btn-outline gap-1 rounded-md"
-              >
-                <ChevronLeft className="size-4" />
-                Previous
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!hasMore || loading}
-                onClick={goNext}
-                className="admin-btn-outline gap-1 rounded-md"
-              >
-                Next
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
-          )}
+        {/* Submissions table */}
+        <div className="admin-card rounded-2xl">
+          <AdminDataTable<ContentSubmissionRow>
+            rows={rows}
+            columns={tableColumns}
+            getRowKey={(row) => row.id}
+            startIndex={pageStartIndex + 1}
+            loading={loading}
+            hasPrev={hasPrev}
+            hasMore={hasMore}
+            onPrev={goPrev}
+            onNext={goNext}
+            emptyTitle="No submissions yet"
+            emptyDescription="Once memories are submitted at /share-memories, they'll appear here for review."
+            minWidthClassName="min-w-[920px]"
+            totalRowsLabel={
+              totalCount !== null ? (
+                <>Total: {totalCount.toLocaleString()}</>
+              ) : null
+            }
+          />
         </div>
       </div>
 
@@ -564,72 +667,6 @@ export function AdminContentSubmissionsView({
 
       <Toaster />
     </>
-  )
-}
-
-function SubmissionCard({
-  row,
-  onOpen,
-}: {
-  row: ContentSubmissionRow
-  onOpen: () => void
-}) {
-  const firstImage = row.image_keys?.[0]
-  const extra = Math.max(0, (row.image_keys?.length ?? 0) - 1)
-  const submitted = row.created_at
-    ? formatDistanceToNow(new Date(row.created_at), { addSuffix: true })
-    : ""
-
-  return (
-    <li>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-orange-200 bg-white text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-300"
-      >
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-orange-50">
-          {firstImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={publicUrlForKey(firstImage.key)}
-              alt={firstImage.filename}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
-              No image
-            </div>
-          )}
-          {extra > 0 && (
-            <span className="absolute bottom-2 right-2 rounded-full bg-black/65 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-              +{extra} more
-            </span>
-          )}
-          <span
-            className={`absolute left-2 top-2 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ring-1 ${STATUS_PILL_CLASS[row.status]}`}
-          >
-            {STATUS_LABEL[row.status]}
-          </span>
-        </div>
-        <div className="flex flex-1 flex-col gap-1 p-3">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="truncate text-sm font-semibold text-gray-900">
-              {row.family_name}
-            </p>
-            <span className="shrink-0 text-[11px] text-gray-500">
-              {submitted}
-            </span>
-          </div>
-          <p className="text-xs text-gray-600">
-            {row.village} · {mandalStoredToDisplay(row.mandal)}
-          </p>
-          <p className="line-clamp-2 pt-1 text-xs text-gray-500">
-            {row.caption}
-          </p>
-        </div>
-      </button>
-    </li>
   )
 }
 
@@ -648,7 +685,6 @@ function SubmissionDetailDialog({
   const [notes, setNotes] = useState("")
   const [savingStatus, setSavingStatus] =
     useState<ContentSubmissionStatus | null>(null)
-  const [downloadingAll, setDownloadingAll] = useState(false)
   const lastIdRef = useRef<string | null>(null)
   const { toast } = useToast()
 
@@ -703,45 +739,6 @@ function SubmissionDetailDialog({
     setSavingStatus(null)
   }
 
-  const downloadAllImages = async (current: ContentSubmissionRow) => {
-    const images = current.image_keys ?? []
-    if (images.length === 0) return
-    setDownloadingAll(true)
-    let failed = 0
-    try {
-      for (let i = 0; i < images.length; i++) {
-        const img = images[i]
-        try {
-          await downloadImageBlob(
-            publicUrlForKey(img.key),
-            buildDownloadName(current, img.filename)
-          )
-        } catch {
-          failed++
-        }
-        if (i < images.length - 1) {
-          await new Promise((r) => setTimeout(r, 200))
-        }
-      }
-      if (failed > 0) {
-        toast({
-          title: `Downloaded ${images.length - failed} of ${images.length} photos`,
-          description: `${failed} could not be downloaded. Try right-clicking the thumbnail and saving instead.`,
-          className:
-            "bg-amber-500 text-white border-amber-400 shadow-xl font-medium",
-        })
-      } else {
-        toast({
-          title: `Downloaded ${images.length} photo${images.length === 1 ? "" : "s"}`,
-          className:
-            "bg-green-500 text-white border-green-400 shadow-xl font-medium",
-        })
-      }
-    } finally {
-      setDownloadingAll(false)
-    }
-  }
-
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="admin-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[95vw] max-w-4xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-0 shadow-2xl">
@@ -763,19 +760,14 @@ function SubmissionDetailDialog({
                 Photos ({row.image_keys?.length ?? 0})
               </SectionLabel>
               {(row.image_keys?.length ?? 0) > 0 && (
-                <button
-                  type="button"
-                  onClick={() => downloadAllImages(row)}
-                  disabled={downloadingAll}
-                  className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700 ring-1 ring-orange-200 transition-colors hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+                <a
+                  href={`/api/admin/content-submissions/${row.id}/zip`}
+                  className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700 ring-1 ring-orange-200 transition-colors hover:bg-orange-100"
+                  title="Download a ZIP with this submission's photos and data"
                 >
-                  {downloadingAll ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <Download className="size-3.5" />
-                  )}
-                  {downloadingAll ? "Downloading…" : "Download all"}
-                </button>
+                  <Download className="size-3.5" />
+                  Download ZIP
+                </a>
               )}
             </div>
             <ul className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
