@@ -81,7 +81,7 @@ export async function GET(request: Request) {
   for (const row of rows) {
     const folderSlug = buildFolderSlug(row)
     const rowFolder = photosFolder?.folder(folderSlug)
-    rowFolder?.file("submission.txt", buildReadableSummary(row))
+    rowFolder?.file("metadata.json", JSON.stringify(row, null, 2))
     for (const img of row.image_keys ?? []) {
       try {
         const buffer = await fetchR2Object(img.key)
@@ -160,8 +160,7 @@ function csvCell(value: unknown): string {
 
 function buildFolderSlug(row: ContentSubmissionRow): string {
   const slug = slugify(`${row.family_name}-${row.village}`)
-  const shortId = row.id.slice(0, 8)
-  return `${slug || "submission"}-${shortId}`
+  return `${slug || "submission"}_${row.id}`
 }
 
 function slugify(input: string): string {
@@ -170,33 +169,6 @@ function slugify(input: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60)
-}
-
-function buildReadableSummary(row: ContentSubmissionRow): string {
-  const phone =
-    [row.uploader_phone_country_code, row.uploader_mobile_number]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "—"
-  return [
-    `Family Name: ${row.family_name}`,
-    `Ghaam: ${row.village}`,
-    `Mandal: ${row.mandal}`,
-    `Submitted: ${row.created_at ?? "—"}`,
-    `Status: ${row.status}`,
-    "",
-    "Caption / Story:",
-    row.caption,
-    "",
-    "Uploader contact:",
-    `  Name:  ${row.uploader_name ?? "—"}`,
-    `  Email: ${row.uploader_email ?? "—"}`,
-    `  Phone: ${phone}`,
-    "",
-    "Internal notes:",
-    row.notes ?? "—",
-    "",
-  ].join("\n")
 }
 
 function buildReadme(
@@ -218,7 +190,7 @@ function buildReadme(
     "Layout:",
     "  data.csv             — table of every submission included in this archive",
     "  photos/<family>-<id>/ — one folder per submission",
-    "    submission.txt     — readable summary (caption, contact, notes)",
+    "    metadata.json      — full row data (caption, contact, status, notes)",
     "    <photo files>      — original-quality images submitted by the family",
     "",
   ].join("\n")

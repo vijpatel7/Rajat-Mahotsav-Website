@@ -46,10 +46,8 @@ import {
 import { Toaster } from "@/components/molecules/toaster"
 import { useToast } from "@/hooks/use-toast"
 import {
-  CONTENT_SUBMISSION_STATUSES,
   type ContentImageKey,
   type ContentSubmissionRow,
-  type ContentSubmissionStatus,
   publicUrlForKey,
 } from "@/lib/content-submissions-admin"
 import { mandalStoredToDisplay, getAllMandalOptionsStored } from "@/lib/mandal-options"
@@ -58,22 +56,6 @@ import {
   AdminDataTable,
   type AdminDataTableColumn,
 } from "@/app/admin/components/AdminDataTable"
-
-const STATUS_LABEL: Record<ContentSubmissionStatus, string> = {
-  new: "New",
-  approved: "Approved",
-  posted: "Posted",
-  rejected: "Rejected",
-  archived: "Archived",
-}
-
-const STATUS_PILL_CLASS: Record<ContentSubmissionStatus, string> = {
-  new: "bg-amber-100 text-amber-800 ring-amber-200",
-  approved: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  posted: "bg-sky-100 text-sky-800 ring-sky-200",
-  rejected: "bg-rose-100 text-rose-700 ring-rose-200",
-  archived: "bg-gray-100 text-gray-700 ring-gray-200",
-}
 
 type PaginatedResponse = {
   success?: boolean
@@ -267,35 +249,6 @@ export function AdminContentSubmissionsView({
     )
   }
 
-  const setStatus = async (id: string, status: ContentSubmissionStatus) => {
-    try {
-      const res = await fetch(`/api/admin/content-submissions/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      })
-      const json = (await res.json()) as {
-        success?: boolean
-        row?: Partial<ContentSubmissionRow>
-        error?: string
-      }
-      if (!res.ok || !json.success) throw new Error(json.error || "Update failed")
-      updateRow(id, json.row ?? { status })
-      toast({
-        title: `Marked as ${STATUS_LABEL[status]}`,
-        className:
-          "bg-green-500 text-white border-green-400 shadow-xl font-medium",
-      })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Try again"
-      toast({
-        title: "Update failed",
-        description: message,
-        className: "bg-red-500 text-white border-red-400 shadow-xl font-medium",
-      })
-    }
-  }
-
   const saveNotes = async (id: string, notes: string) => {
     try {
       const res = await fetch(`/api/admin/content-submissions/${id}`, {
@@ -348,36 +301,6 @@ export function AdminContentSubmissionsView({
 
   const tableColumns: AdminDataTableColumn<ContentSubmissionRow>[] = [
     {
-      key: "thumbnail",
-      header: "",
-      className: "w-20 py-3 px-2",
-      cellClassName: "py-2 px-2",
-      render: (row) => {
-        const first = row.image_keys?.[0]
-        if (!first) {
-          return (
-            <div className="h-14 w-14 rounded-md bg-orange-50 ring-1 ring-orange-200" />
-          )
-        }
-        return (
-          <button
-            type="button"
-            onClick={() => setActiveRow(row)}
-            className="block h-14 w-14 overflow-hidden rounded-md ring-1 ring-orange-200 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            aria-label="View submission details"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={publicUrlForKey(first.key)}
-              alt={first.filename}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </button>
-        )
-      },
-    },
-    {
       key: "family_name",
       header: "Family Name",
       render: (row) => (
@@ -407,22 +330,11 @@ export function AdminContentSubmissionsView({
       ),
     },
     {
-      key: "status",
-      header: "Status",
-      className: "w-28 text-left py-3 px-3 font-semibold reg-text-primary",
-      render: (row) => (
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ring-1 ${STATUS_PILL_CLASS[row.status]}`}
-        >
-          {STATUS_LABEL[row.status]}
-        </span>
-      ),
-    },
-    {
       key: "photos",
       header: "Photos",
       className: "w-16 text-center py-3 px-2 font-semibold reg-text-primary",
-      cellClassName: "py-2.5 px-2 text-center text-sm tabular-nums",
+      cellClassName:
+        "py-2.5 px-2 text-center text-sm font-medium tabular-nums reg-text-primary",
       render: (row) => row.image_keys?.length ?? 0,
     },
     {
@@ -538,38 +450,7 @@ export function AdminContentSubmissionsView({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="space-y-1.5">
-                    <Label className="reg-label text-xs">Status</Label>
-                    <Select
-                      value={filters.status || ALL_VALUE}
-                      onValueChange={(v) =>
-                        onFilterChange("status", v === ALL_VALUE ? "" : v)
-                      }
-                    >
-                      <SelectTrigger className="reg-input rounded-md">
-                        <SelectValue placeholder="Any status" />
-                      </SelectTrigger>
-                      <SelectContent className="reg-popover rounded-xl">
-                        <SelectItem
-                          value={ALL_VALUE}
-                          className="reg-popover-item rounded-lg"
-                        >
-                          Any status
-                        </SelectItem>
-                        {CONTENT_SUBMISSION_STATUSES.map((s) => (
-                          <SelectItem
-                            key={s}
-                            value={s}
-                            className="reg-popover-item rounded-lg"
-                          >
-                            {STATUS_LABEL[s]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
+                <div className="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-3">
                   <div className="space-y-1.5">
                     <Label className="reg-label text-xs">Mandal</Label>
                     <Select
@@ -661,7 +542,6 @@ export function AdminContentSubmissionsView({
       <SubmissionDetailDialog
         row={activeRow}
         onClose={() => setActiveRow(null)}
-        onStatusChange={setStatus}
         onSaveNotes={saveNotes}
       />
 
@@ -673,25 +553,20 @@ export function AdminContentSubmissionsView({
 function SubmissionDetailDialog({
   row,
   onClose,
-  onStatusChange,
   onSaveNotes,
 }: {
   row: ContentSubmissionRow | null
   onClose: () => void
-  onStatusChange: (id: string, status: ContentSubmissionStatus) => void
   onSaveNotes: (id: string, notes: string) => void
 }) {
   const open = Boolean(row)
   const [notes, setNotes] = useState("")
-  const [savingStatus, setSavingStatus] =
-    useState<ContentSubmissionStatus | null>(null)
   const lastIdRef = useRef<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
     if (row && row.id !== lastIdRef.current) {
       setNotes(row.notes ?? "")
-      setSavingStatus(null)
       lastIdRef.current = row.id
     }
     if (!row) {
@@ -731,12 +606,6 @@ function SubmissionDetailDialog({
         })
       )
       .catch(() => undefined)
-  }
-
-  const handleStatus = async (next: ContentSubmissionStatus) => {
-    setSavingStatus(next)
-    await onStatusChange(row.id, next)
-    setSavingStatus(null)
   }
 
   return (
@@ -830,43 +699,6 @@ function SubmissionDetailDialog({
                 Uploader did not provide contact info.
               </p>
             )}
-          </section>
-
-          {/* Status workflow */}
-          <section>
-            <SectionLabel>Status</SectionLabel>
-            <p className="mt-1 text-xs text-gray-500">
-              Current:{" "}
-              <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ring-1 ${STATUS_PILL_CLASS[row.status]}`}
-              >
-                {STATUS_LABEL[row.status]}
-              </span>
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {CONTENT_SUBMISSION_STATUSES.map((s) => {
-                const isCurrent = s === row.status
-                const isSaving = savingStatus === s
-                return (
-                  <Button
-                    key={s}
-                    type="button"
-                    onClick={() => handleStatus(s)}
-                    disabled={isCurrent || savingStatus !== null}
-                    className={
-                      isCurrent
-                        ? "admin-btn-outline cursor-default rounded-full opacity-60"
-                        : "admin-btn-primary rounded-full"
-                    }
-                  >
-                    {isSaving ? (
-                      <Loader2 className="mr-1.5 size-4 animate-spin" />
-                    ) : null}
-                    {STATUS_LABEL[s]}
-                  </Button>
-                )
-              })}
-            </div>
           </section>
 
           {/* Notes */}

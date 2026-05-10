@@ -6,6 +6,7 @@ import { Noto_Sans_Gujarati } from "next/font/google"
 import Script from "next/script"
 import { ThemeProvider } from "@/components/atoms/theme-provider"
 import { Navigation } from "@/components/organisms/navigation"
+import { AnnouncementBanner } from "@/components/atoms/announcement-banner"
 import StickyFooter from "@/components/organisms/sticky-footer"
 import { ScrollToTop } from "@/components/atoms/scroll-to-top"
 import { FloatingMenuButton } from "@/components/organisms/floating-menu-button"
@@ -122,6 +123,7 @@ html {
         <LoadingProvider>
           <AudioProvider>
             <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
+              <AnnouncementBanner />
               <Navigation />
               <div className="min-h-screen flex flex-col">
                 <main className="flex-1">

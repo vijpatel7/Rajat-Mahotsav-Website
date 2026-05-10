@@ -15,7 +15,6 @@ import "@/styles/registration-theme.css"
 import PratisthaStory from "@/components/organisms/pratishta-story"
 import AashirwadSection from "@/components/organisms/aashirwad-section"
 import VideoBackgroundSection from "@/components/organisms/video-background-section"
-import ShareMemoriesCTA from "@/components/organisms/share-memories-cta"
 
 const gurus = [
   {
@@ -223,9 +222,6 @@ export default function ShaderShowcase() {
 
           {/* Video section */}
           <VideoSection />
-
-          {/* Share memories CTA */}
-          <ShareMemoriesCTA />
         </div>
       </div>
     </>

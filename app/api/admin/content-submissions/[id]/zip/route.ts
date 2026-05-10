@@ -60,7 +60,6 @@ export async function GET(
 
   const zip = new JSZip()
   zip.file("metadata.json", JSON.stringify(row, null, 2))
-  zip.file("submission.txt", buildReadableSummary(row))
 
   const photosFolder = zip.folder("photos")
   for (const img of row.image_keys ?? []) {
@@ -108,35 +107,6 @@ function slugify(input: string): string {
 
 function buildArchiveFilename(row: ContentSubmissionRow): string {
   const slug = slugify(`${row.family_name}-${row.village}`)
-  const shortId = row.id.slice(0, 8)
-  return `${slug || "submission"}-${shortId}.zip`
+  return `${slug || "submission"}_${row.id}.zip`
 }
 
-function buildReadableSummary(row: ContentSubmissionRow): string {
-  const phone =
-    [row.uploader_phone_country_code, row.uploader_mobile_number]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "—"
-
-  return [
-    `Family Name: ${row.family_name}`,
-    `Ghaam: ${row.village}`,
-    `Mandal: ${row.mandal}`,
-    `Submitted: ${row.created_at ?? "—"}`,
-    `Status: ${row.status}`,
-    `Posted: ${row.posted_at ?? "—"}`,
-    "",
-    "Caption / Story:",
-    row.caption,
-    "",
-    "Uploader contact (optional, only if provided):",
-    `  Name:  ${row.uploader_name ?? "—"}`,
-    `  Email: ${row.uploader_email ?? "—"}`,
-    `  Phone: ${phone}`,
-    "",
-    "Internal notes:",
-    row.notes ?? "—",
-    "",
-  ].join("\n")
-}
