@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ImagePlus, UploadCloud, X } from "lucide-react"
+import { formatBytes } from "@/lib/utils"
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic", "image/heif"]
 const ACCEPT_ATTR = ".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
@@ -25,12 +26,6 @@ function validateFile(file: File): string | null {
   if (!isAcceptedType) return `${file.name}: only JPG, PNG, or HEIC files are allowed.`
   if (file.size > MAX_FILE_BYTES) return `${file.name}: file is larger than 5MB.`
   return null
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export default function ImageUploadZone({

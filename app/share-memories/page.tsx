@@ -304,7 +304,7 @@ export default function ShareMemoriesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              Share Your Mahotsav Memories
+              Share Your NJ Mandir Memories
             </motion.h1>
 
             <motion.div
