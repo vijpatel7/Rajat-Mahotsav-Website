@@ -10,7 +10,7 @@ const ALLOWED_TYPES = new Set([
   "image/heic",
   "image/heif",
 ])
-const MAX_FILE_BYTES = 10 * 1024 * 1024
+const MAX_FILE_BYTES = 5 * 1024 * 1024
 const MAX_FILES = 3
 // Unique R2 prefix for /share-memories submissions; intentionally not shared
 // with cs_personal_submissions, hotels, audio_files, wallpapers, or anything else.
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       }
       if (typeof f.size === "number" && f.size > MAX_FILE_BYTES) {
         return Response.json(
-          { error: `${f.name} is larger than 10MB.` } satisfies ResponsePayload,
+          { error: `${f.name} is larger than 5MB.` } satisfies ResponsePayload,
           { status: 400 }
         )
       }

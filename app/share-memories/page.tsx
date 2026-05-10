@@ -776,10 +776,8 @@ function SampleSubmission() {
           <span className="text-sm text-gray-800 sm:text-base">New Jersey</span>
         </SampleRow>
 
-        <div className="mt-5 grid grid-cols-1 gap-5 border-t border-orange-100 pt-5 md:grid-cols-2 md:gap-8">
-          <BulletColumn
-            label="Photos"
-            heading="Photo ideas"
+        <SampleRow label="Photos">
+          <BulletGrid
             items={[
               "Unique moments from past celebrations or events",
               "Cherished family memories made at NJ Mandir",
@@ -788,9 +786,10 @@ function SampleSubmission() {
               "Life-long memories tied to NJ Mandir's decorated history",
             ]}
           />
-          <BulletColumn
-            label="Your story"
-            heading="Story ideas"
+        </SampleRow>
+
+        <SampleRow label="Your story">
+          <BulletGrid
             items={[
               "Describe what is happening in your photos",
               "What NJ Mandir has meant to your family",
@@ -799,7 +798,7 @@ function SampleSubmission() {
               "Your first time seeing NJ Mandir",
             ]}
           />
-        </div>
+        </SampleRow>
       </div>
 
       <p className="mt-3 text-center text-xs italic text-gray-500">
@@ -810,38 +809,19 @@ function SampleSubmission() {
   )
 }
 
-function BulletColumn({
-  label,
-  heading,
-  items,
-}: {
-  label: string
-  heading: string
-  items: string[]
-}) {
+function BulletGrid({ items }: { items: string[] }) {
   return (
-    <div>
-      <div className="mb-2 flex items-center gap-2">
-        <span className="whitespace-nowrap rounded-md bg-orange-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-orange-700 ring-1 ring-orange-200 sm:text-xs">
-          {label}
-        </span>
-        <ArrowGlyph />
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 sm:text-xs">
-          {heading}
-        </span>
-      </div>
-      <ul className="space-y-1.5 pl-1 text-xs leading-relaxed text-gray-700 sm:text-sm">
-        {items.map((item) => (
-          <li key={item} className="flex gap-2">
-            <span
-              aria-hidden
-              className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500/80"
-            />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="space-y-1.5 text-xs leading-relaxed text-gray-700 sm:columns-2 sm:gap-x-6 sm:text-sm">
+      {items.map((item) => (
+        <li key={item} className="flex break-inside-avoid gap-2">
+          <span
+            aria-hidden
+            className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500/80"
+          />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   )
 }
 

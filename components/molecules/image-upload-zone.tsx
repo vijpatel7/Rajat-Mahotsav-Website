@@ -6,7 +6,7 @@ import { ImagePlus, UploadCloud, X } from "lucide-react"
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic", "image/heif"]
 const ACCEPT_ATTR = ".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
-const MAX_FILE_BYTES = 10 * 1024 * 1024
+const MAX_FILE_BYTES = 5 * 1024 * 1024
 const MAX_FILES = 3
 
 type ImageUploadZoneProps = {
@@ -23,7 +23,7 @@ function validateFile(file: File): string | null {
     ACCEPTED_TYPES.includes(file.type.toLowerCase()) ||
     /\.(jpe?g|png|heic|heif)$/i.test(file.name)
   if (!isAcceptedType) return `${file.name}: only JPG, PNG, or HEIC files are allowed.`
-  if (file.size > MAX_FILE_BYTES) return `${file.name}: file is larger than 10MB.`
+  if (file.size > MAX_FILE_BYTES) return `${file.name}: file is larger than 5MB.`
   return null
 }
 
@@ -169,7 +169,7 @@ export default function ImageUploadZone({
                 : "Tap to add photos, or drag and drop"}
           </p>
           <p className="text-xs text-gray-500 sm:text-sm">
-            JPG, PNG, or HEIC, up to 10MB each, {maxFiles} photos max
+            JPG, PNG, or HEIC, up to 5MB each, {maxFiles} photos max
           </p>
         </div>
         <p className="mt-1 text-xs font-medium text-orange-700">
