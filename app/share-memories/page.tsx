@@ -365,7 +365,7 @@ export default function ShareMemoriesPage() {
                               htmlFor="familyName"
                               className="reg-label"
                             >
-                              Family name *
+                              Family Name *
                             </Label>
                             <Controller
                               name="familyName"
@@ -375,7 +375,7 @@ export default function ShareMemoriesPage() {
                                   {...field}
                                   id="familyName"
                                   type="text"
-                                  placeholder="e.g. Patel"
+                                  placeholder="e.g. Pankajbhai Vinodbhai Patel & Family"
                                   className="reg-input rounded-md"
                                 />
                               )}
@@ -399,7 +399,7 @@ export default function ShareMemoriesPage() {
                                   {...field}
                                   id="village"
                                   type="text"
-                                  placeholder="e.g. Vasna, Karamsad"
+                                  placeholder="e.g. Mokhasan, Gavada, Karjisan, ..."
                                   className="reg-input rounded-md"
                                 />
                               )}
@@ -762,9 +762,9 @@ function SampleSubmission() {
         <span className="album-tape album-tape-left" aria-hidden />
         <span className="album-tape album-tape-right" aria-hidden />
 
-        <SampleRow label="Family name">
+        <SampleRow label="Family Name">
           <span className="text-base font-bold tracking-wide text-gray-900 sm:text-lg">
-            Vijay Kamlesh Patel
+            Pankajbhai Vinodbhai Patel & Family
           </span>
         </SampleRow>
 

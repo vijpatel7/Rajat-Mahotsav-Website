@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { isAdminDomainUser } from "@/lib/admin-auth"
+import { isContentSubmissionsViewer } from "@/lib/admin-auth"
 import {
   CONTENT_SUBMISSIONS_TABLE,
   CONTENT_SUBMISSION_COLUMNS,
@@ -35,9 +35,9 @@ export async function GET(request: Request) {
     )
   }
 
-  if (!isAdminDomainUser(user)) {
+  if (!isContentSubmissionsViewer(user)) {
     return NextResponse.json(
-      { error: "Forbidden", message: "Admin domain (@nj.sgadi.us) required" },
+      { error: "Forbidden", message: "Access not granted for this account" },
       { status: 403, headers }
     )
   }

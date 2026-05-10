@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
-import { isAdminDomainUser } from "@/lib/admin-auth"
+import { isContentSubmissionsViewer } from "@/lib/admin-auth"
 import { CONTENT_SUBMISSIONS_TABLE } from "@/lib/content-submissions-admin"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { AdminSignIn } from "../registrations/AdminSignIn"
@@ -33,7 +33,7 @@ export default async function AdminContentSubmissionsPage() {
   } = await supabase.auth.getUser()
 
   if (user) {
-    if (!isAdminDomainUser(user)) {
+    if (!isContentSubmissionsViewer(user)) {
       redirect("/admin/registrations/unauthorized")
     }
 
@@ -45,7 +45,7 @@ export default async function AdminContentSubmissionsPage() {
       <div className="page-bg-extend reg-page-bg min-h-screen">
         <div className="container mx-auto max-w-6xl px-4 page-bottom-spacing">
           <StandardPageHeader
-            title="Mahotsav Memories"
+            title="View NJ Mandir Memories"
             description="Photos and stories submitted by the community. Approve, post, or archive entries for the social team."
           />
           <AdminContentSubmissionsView initialTotalCount={count ?? null} />
@@ -59,7 +59,7 @@ export default async function AdminContentSubmissionsPage() {
       <div className="container mx-auto max-w-6xl px-4 page-bottom-spacing">
         <StandardPageHeader
           title="Admin Access"
-          description="Sign in with your @nj.sgadi.us Google account to view community memory submissions."
+          description="Sign in with your authorized Google account to view community memory submissions."
         />
         <div className="mt-12 flex justify-center">
           <AdminSignIn nextPath="/admin/content-submissions" />

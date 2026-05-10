@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { isAdminDomainUser } from "@/lib/admin-auth"
+import { isContentSubmissionsViewer } from "@/lib/admin-auth"
 import {
   CONTENT_SUBMISSIONS_TABLE,
   CONTENT_SUBMISSION_STATUSES,
@@ -45,7 +45,7 @@ export async function PATCH(
       { status: 401, headers }
     )
   }
-  if (!isAdminDomainUser(user)) {
+  if (!isContentSubmissionsViewer(user)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403, headers })
   }
 

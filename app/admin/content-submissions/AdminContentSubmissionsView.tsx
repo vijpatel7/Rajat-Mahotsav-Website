@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Download,
   ExternalLink,
   Filter,
   Loader2,
@@ -647,6 +648,7 @@ function SubmissionDetailDialog({
   const [notes, setNotes] = useState("")
   const [savingStatus, setSavingStatus] =
     useState<ContentSubmissionStatus | null>(null)
+  const [downloadingAll, setDownloadingAll] = useState(false)
   const lastIdRef = useRef<string | null>(null)
   const { toast } = useToast()
 
@@ -701,6 +703,45 @@ function SubmissionDetailDialog({
     setSavingStatus(null)
   }
 
+  const downloadAllImages = async (current: ContentSubmissionRow) => {
+    const images = current.image_keys ?? []
+    if (images.length === 0) return
+    setDownloadingAll(true)
+    let failed = 0
+    try {
+      for (let i = 0; i < images.length; i++) {
+        const img = images[i]
+        try {
+          await downloadImageBlob(
+            publicUrlForKey(img.key),
+            buildDownloadName(current, img.filename)
+          )
+        } catch {
+          failed++
+        }
+        if (i < images.length - 1) {
+          await new Promise((r) => setTimeout(r, 200))
+        }
+      }
+      if (failed > 0) {
+        toast({
+          title: `Downloaded ${images.length - failed} of ${images.length} photos`,
+          description: `${failed} could not be downloaded. Try right-clicking the thumbnail and saving instead.`,
+          className:
+            "bg-amber-500 text-white border-amber-400 shadow-xl font-medium",
+        })
+      } else {
+        toast({
+          title: `Downloaded ${images.length} photo${images.length === 1 ? "" : "s"}`,
+          className:
+            "bg-green-500 text-white border-green-400 shadow-xl font-medium",
+        })
+      }
+    } finally {
+      setDownloadingAll(false)
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="admin-scrollbar fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[95vw] max-w-4xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-0 shadow-2xl">
@@ -717,12 +758,33 @@ function SubmissionDetailDialog({
         <div className="space-y-6 p-5">
           {/* Images */}
           <section>
-            <SectionLabel>
-              Photos ({row.image_keys?.length ?? 0})
-            </SectionLabel>
-            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="flex items-center justify-between gap-3">
+              <SectionLabel>
+                Photos ({row.image_keys?.length ?? 0})
+              </SectionLabel>
+              {(row.image_keys?.length ?? 0) > 0 && (
+                <button
+                  type="button"
+                  onClick={() => downloadAllImages(row)}
+                  disabled={downloadingAll}
+                  className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700 ring-1 ring-orange-200 transition-colors hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {downloadingAll ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Download className="size-3.5" />
+                  )}
+                  {downloadingAll ? "Downloading…" : "Download all"}
+                </button>
+              )}
+            </div>
+            <ul className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
               {(row.image_keys ?? []).map((img) => (
-                <ImageTile key={img.key} image={img} />
+                <ImageTile
+                  key={img.key}
+                  image={img}
+                  downloadName={buildDownloadName(row, img.filename)}
+                />
               ))}
             </ul>
           </section>
@@ -841,9 +903,29 @@ function SubmissionDetailDialog({
   )
 }
 
-function ImageTile({ image }: { image: ContentImageKey }) {
+function ImageTile({
+  image,
+  downloadName,
+}: {
+  image: ContentImageKey
+  downloadName: string
+}) {
   const url = publicUrlForKey(image.key)
   const sizeLabel = formatBytes(image.size_bytes)
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    setDownloading(true)
+    try {
+      await downloadImageBlob(url, downloadName)
+    } catch {
+      // Open in a new tab as a fallback so the user can right-click to save.
+      window.open(url, "_blank", "noreferrer")
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <li className="overflow-hidden rounded-xl border border-orange-100 bg-white shadow-sm">
       <a
@@ -861,21 +943,68 @@ function ImageTile({ image }: { image: ContentImageKey }) {
         />
       </a>
       <div className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gray-600">
-        <span className="truncate" title={image.filename}>
-          {image.filename}
-        </span>
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex shrink-0 items-center gap-1 text-orange-700 hover:text-orange-900"
-        >
-          <ExternalLink className="size-3.5" />
-          {sizeLabel}
-        </a>
+        <div className="min-w-0">
+          <p className="truncate" title={image.filename}>
+            {image.filename}
+          </p>
+          <p className="text-[10px] text-gray-400">{sizeLabel}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open in new tab"
+            title="Open in new tab"
+            className="inline-flex size-7 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 hover:text-orange-900"
+          >
+            <ExternalLink className="size-3.5" />
+          </a>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
+            aria-label="Download photo"
+            title="Download"
+            className="inline-flex size-7 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 hover:text-orange-900 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {downloading ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Download className="size-3.5" />
+            )}
+          </button>
+        </div>
       </div>
     </li>
   )
+}
+
+function buildDownloadName(row: ContentSubmissionRow, filename: string): string {
+  const slug = `${row.family_name}-${row.village}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+  return slug ? `${slug}-${filename}` : filename
+}
+
+async function downloadImageBlob(url: string, filename: string): Promise<void> {
+  const res = await fetch(url, { mode: "cors", credentials: "omit" })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const blob = await res.blob()
+  const objectUrl = URL.createObjectURL(blob)
+  try {
+    const a = document.createElement("a")
+    a.href = objectUrl
+    a.download = filename
+    a.rel = "noopener"
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
 }
 
 function ContactItem({
