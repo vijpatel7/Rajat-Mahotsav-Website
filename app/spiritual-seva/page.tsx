@@ -135,65 +135,50 @@ export default function SpiritualSevaPage() {
 
   const spiritualStats = [
     {
-      icon: Send,
-      label: "Submissions",
-      current: statsData.total_submissions,
-      target: 25,
-    },
-    {
       icon: BookOpenText,
       label: "Malas",
       current: statsData.malas,
-      target: 250,
     },
     {
       icon: Clock,
       label: "Dhyaan",
       current: statsData.dhyan,
-      target: 250,
       suffix: "min",
     },
     {
       icon: Footprints,
       label: "Pradakshinas",
       current: statsData.pradakshinas,
-      target: 250,
     },
     {
       icon: Heart,
       label: "Dandvats",
       current: statsData.dandvats,
-      target: 250,
     },
     {
       icon: Footprints,
       label: "Padyatras",
       current: statsData.padyatras,
-      target: 25,
     },
     {
       icon: Apple,
       label: "Upvas",
       current: statsData.upvas,
-      target: 25,
     },
     {
       icon: BookOpenText,
       label: "Sadachar Sandesh",
       current: statsData.sadachar,
-      target: 1,
     },
     {
       icon: BookOpenText,
       label: "Harignanamrut Kavya",
       current: statsData.harignanamrut,
-      target: 1,
     },
     {
       icon: BookOpenText,
       label: "Bapashree ni Vato",
       current: statsData.bapashree,
-      target: 1,
     },
   ]
 
@@ -268,6 +253,7 @@ export default function SpiritualSevaPage() {
                   <ProgressCounter
                     key={stat.label}
                     {...stat}
+                    mode="total"
                     delay={index * 0.1}
                     inView={isStatsInView}
                   />
@@ -284,7 +270,7 @@ export default function SpiritualSevaPage() {
                   transition={{ duration: 0.8 }}
                   className="text-2xl md:text-3xl font-bold text-gray-800 text-center"
                 >
-                  Monthly Spiritual Goals
+                  Personal Monthly Spiritual Goals
                 </motion.h3>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
