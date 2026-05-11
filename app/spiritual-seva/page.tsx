@@ -1,15 +1,20 @@
 "use client"
 import Link from "next/link"
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect, useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { useDeviceType } from "@/hooks/use-device-type"
-import { Clock, Footprints, BookOpenText, Apple, Send } from "lucide-react"
+import { Clock, Footprints, BookOpenText, Apple, Send, Heart } from "lucide-react"
 import { GiPrayerBeads } from "react-icons/gi"
 import { PiHandsPraying } from "react-icons/pi"
 import { ImageMarquee } from "@/components/organisms/image-marquee"
 import { SevaSubmissionForm } from "@/components/organisms/seva-submission-form"
 import { ResponsiveImageGallery } from "@/components/organisms/responsive-image-gallery"
+import { ProgressCounter } from "@/components/molecules/progress-counter"
+import {
+  normalizeSpiritualSevaStats,
+  type SpiritualSevaStats,
+} from "@/lib/spiritual-seva-stats"
 import "@/styles/community-service-theme.css"
 import { getCloudflareImage, getR2Image } from "@/lib/cdn-assets"
 
@@ -77,6 +82,12 @@ const whyWeServeImages = [
 
 export default function SpiritualSevaPage() {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [statsData, setStatsData] = useState<SpiritualSevaStats>(() =>
+    normalizeSpiritualSevaStats(null)
+  )
+  const [statsError, setStatsError] = useState<string | null>(null)
+  const statsRef = useRef(null)
+  const isStatsInView = useInView(statsRef, { once: true, margin: "-100px" })
   const deviceType = useDeviceType()
 
   useEffect(() => {
@@ -91,6 +102,85 @@ export default function SpiritualSevaPage() {
     const timer = setTimeout(() => setIsLoaded(true), 200)
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function fetchSpiritualStats() {
+      try {
+        const response = await fetch("/api/spiritual-seva/stats", { cache: "no-store" })
+        const payload = await response.json()
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.details || payload.error || "Unable to load spiritual seva stats")
+        }
+
+        if (isMounted) {
+          setStatsData(normalizeSpiritualSevaStats(payload.stats))
+          setStatsError(null)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setStatsError(error instanceof Error ? error.message : "Unable to load spiritual seva stats")
+        }
+      }
+    }
+
+    fetchSpiritualStats()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const spiritualStats = [
+    {
+      icon: BookOpenText,
+      label: "Malas",
+      current: statsData.malas,
+    },
+    {
+      icon: Clock,
+      label: "Dhyaan",
+      current: statsData.dhyan,
+      suffix: "min",
+    },
+    {
+      icon: Footprints,
+      label: "Pradakshinas",
+      current: statsData.pradakshinas,
+    },
+    {
+      icon: Heart,
+      label: "Dandvats",
+      current: statsData.dandvats,
+    },
+    {
+      icon: Footprints,
+      label: "Padyatras",
+      current: statsData.padyatras,
+    },
+    {
+      icon: Apple,
+      label: "Upvas",
+      current: statsData.upvas,
+    },
+    {
+      icon: BookOpenText,
+      label: "Sadachar Sandesh",
+      current: statsData.sadachar,
+    },
+    {
+      icon: BookOpenText,
+      label: "Harignanamrut Kavya",
+      current: statsData.harignanamrut,
+    },
+    {
+      icon: BookOpenText,
+      label: "Bapashree ni Vato",
+      current: statsData.bapashree,
+    },
+  ]
 
   return (
     <div
@@ -124,6 +214,53 @@ export default function SpiritualSevaPage() {
           <ResponsiveImageGallery images={whyWeServeImages as any} />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-16">
+            <motion.div
+              ref={statsRef}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1 }}
+              className="space-y-8"
+            >
+              <div className="max-w-4xl mx-auto space-y-4 text-center">
+                <motion.h3
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="text-2xl md:text-3xl font-bold text-gray-800"
+                >
+                  Live Collective Spiritual Seva Progress
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-lg md:text-xl text-gray-700 leading-relaxed"
+                >
+                  These live totals are calculated from all spiritual seva submissions received so far.
+                </motion.p>
+                {statsError && (
+                  <p className="text-sm font-medium text-red-600">
+                    Live spiritual seva totals are temporarily unavailable: {statsError}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {spiritualStats.map((stat, index) => (
+                  <ProgressCounter
+                    key={stat.label}
+                    {...stat}
+                    mode="total"
+                    delay={index * 0.1}
+                    inView={isStatsInView}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
             <div className="space-y-8">
               <div className="max-w-4xl mx-auto space-y-4">
                 <motion.h3
@@ -133,7 +270,7 @@ export default function SpiritualSevaPage() {
                   transition={{ duration: 0.8 }}
                   className="text-2xl md:text-3xl font-bold text-gray-800 text-center"
                 >
-                  Monthly Spiritual Goals
+                  Personal Monthly Spiritual Goals
                 </motion.h3>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
