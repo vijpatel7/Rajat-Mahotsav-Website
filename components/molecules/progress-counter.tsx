@@ -28,7 +28,7 @@ export function ProgressCounter({
   const count = useMotionValue(0)
   const rounded = useTransform(count, (latest) => Math.round(latest))
   const formatted = useTransform(rounded, (latest) => latest.toLocaleString())
-  const progress = (current / target) * 100
+  const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0
 
   useEffect(() => {
     if (inView) {
@@ -46,6 +46,8 @@ export function ProgressCounter({
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.6, delay }}
+      role="group"
+      aria-label={`${label}: ${prefix}${current.toLocaleString()}${suffix} of ${prefix}${target.toLocaleString()}${suffix}`}
     >
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-200 ease-out cursor-pointer p-6 hover:-translate-y-2 hover:scale-[1.02] h-full">
         <div className="text-center">
