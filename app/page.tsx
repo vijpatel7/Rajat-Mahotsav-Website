@@ -15,6 +15,7 @@ import "@/styles/registration-theme.css"
 import PratisthaStory from "@/components/organisms/pratishta-story"
 import AashirwadSection from "@/components/organisms/aashirwad-section"
 import VideoBackgroundSection from "@/components/organisms/video-background-section"
+import TreePlantingBanner from "@/components/organisms/tree-planting-banner"
 
 const gurus = [
   {
@@ -169,6 +170,9 @@ export default function ShaderShowcase() {
 
           {/* Aashirwad Section */}
           <AashirwadSection />
+
+          {/* Featured Tree Plantation Story Banner */}
+          <TreePlantingBanner />
 
           {/* Staggered Guru Cards */}
           <div ref={mobileGuruRef} className="min-h-screen w-full pb-40 px-4 flex flex-col items-center justify-center">
