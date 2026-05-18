@@ -59,22 +59,28 @@ export default function IntroVideoReveal() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isIntersecting = entry.isIntersecting && entry.intersectionRatio >= 0.35
-        if (isIntersecting) {
+        if (entry.isIntersecting) {
           setHasRevealed(true)
           if (sectionRef.current) {
             observer.unobserve(sectionRef.current)
           }
         }
       },
-      { threshold: [0, 0.35, 0.6] }
+      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
     )
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current)
     }
 
-    return () => observer.disconnect()
+    // Fallback in case the observer doesn't fire (short viewport, scroll
+    // restoration) — otherwise the section stays stuck in blur(8px).
+    const fallbackTimer = window.setTimeout(() => setHasRevealed(true), 2500)
+
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(fallbackTimer)
+    }
   }, [])
 
   useEffect(() => {
