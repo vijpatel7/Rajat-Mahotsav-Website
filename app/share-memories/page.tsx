@@ -669,13 +669,13 @@ export default function ShareMemoriesPage() {
                       {/* Privacy + submit */}
                       <div className="space-y-3">
                         <p className="text-xs leading-relaxed text-gray-500 sm:text-sm">
-                          By submitting, you confirm you have permission to
-                          share these photos. All submissions are reviewed
-                          before posting, and we reserve the right to edit
-                          submissions for clarity, length, or appropriateness
-                          before publishing on Mahotsav social channels and
-                          event recap. We will not sell or share your contact
-                          info.
+                          By submitting, you grant Shree Swaminarayan Temple
+                          Secaucus, New Jersey the right to publish, edit, and
+                          share your photos and story publicly across our
+                          channels, as we see fit. All submissions are reviewed
+                          before public display. Please only submit photos you
+                          have the right to share. We will not sell or share
+                          your contact information.
                         </p>
 
                         <button
