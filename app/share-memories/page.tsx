@@ -60,8 +60,8 @@ const FormSchema = z
   .object({
     familyName: z
       .string()
-      .min(1, "Family name is required")
-      .max(120, "Family name is too long"),
+      .min(1, "Name is required")
+      .max(120, "Name is too long"),
     village: z
       .string()
       .min(1, "Ghaam is required")
@@ -317,7 +317,7 @@ export default function ShareMemoriesPage() {
                 Share your memories with NJ Mandir. Send us photos of yourself
                 or your family from past celebrations and events along with a
                 short story. When featured on our channels, we will display your
-                family name, ghaam, mandal, your photos, and your story
+                name, ghaam, mandal, your photos, and your story
                 together.
               </p>
             </motion.div>
@@ -365,7 +365,7 @@ export default function ShareMemoriesPage() {
                               htmlFor="familyName"
                               className="reg-label"
                             >
-                              Family Name *
+                              Name *
                             </Label>
                             <Controller
                               name="familyName"
@@ -375,7 +375,7 @@ export default function ShareMemoriesPage() {
                                   {...field}
                                   id="familyName"
                                   type="text"
-                                  placeholder="e.g. Pankajbhai Vinodbhai Patel & Family"
+                                  placeholder="e.g. Manilal Patel"
                                   className="reg-input rounded-md"
                                 />
                               )}
@@ -762,9 +762,9 @@ function SampleSubmission() {
         <span className="album-tape album-tape-left" aria-hidden />
         <span className="album-tape album-tape-right" aria-hidden />
 
-        <SampleRow label="Family Name">
+        <SampleRow label="Name">
           <span className="text-base font-bold tracking-wide text-gray-900 sm:text-lg">
-            Pankajbhai Vinodbhai Patel & Family
+            Manilal Patel
           </span>
         </SampleRow>
 

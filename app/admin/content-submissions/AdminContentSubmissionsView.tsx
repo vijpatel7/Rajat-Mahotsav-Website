@@ -302,7 +302,7 @@ export function AdminContentSubmissionsView({
   const tableColumns: AdminDataTableColumn<ContentSubmissionRow>[] = [
     {
       key: "family_name",
-      header: "Family Name",
+      header: "Name",
       render: (row) => (
         <button
           type="button"
