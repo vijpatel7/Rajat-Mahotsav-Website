@@ -89,7 +89,7 @@ function MobileImageCarousel({ className }: { className?: string }) {
   )
 }
 
-export default function TitleSectionMobile({ targetDate = "2026-08-02T00:00:00" }: TitleSectionMobileProps) {
+export default function TitleSectionMobile({ targetDate = "2026-07-27T07:30:00-04:00" }: TitleSectionMobileProps) {
   const { isLoading } = useLoading()
 
   return (

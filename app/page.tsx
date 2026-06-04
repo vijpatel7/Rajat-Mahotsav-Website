@@ -32,7 +32,7 @@ const gurus = [
 ]
 
 export default function ShaderShowcase() {
-  const targetDate = '2026-08-02T00:00:00';
+  const targetDate = '2026-07-27T07:30:00-04:00';
   const deviceType = useDeviceType();
 
   const [isLoaded, setIsLoaded] = useState(false)

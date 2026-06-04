@@ -10,7 +10,7 @@ interface TitleSectionProps {
   targetDate?: string
 }
 
-export default function TitleSection({ targetDate = "2026-08-02T00:00:00" }: TitleSectionProps) {
+export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" }: TitleSectionProps) {
   const { isLoading } = useLoading()
 
   return (
