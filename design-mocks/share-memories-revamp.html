@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Share Memories · Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&family=Noto+Serif+Gujarati:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     THEME TOKENS — pulled from the live registration/share theme
+     ============================================================ */
+  :root {
+    --cream-1: #fff7ed;
+    --cream-2: #ffffff;
+    --cream-3: #fef2f2;
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --orange-700: #c2410c;
+    --orange-900: #7c2d12;
+    --red: #ef4444;
+    --red-dark: #dc2626;
+    --border-orange: #fed7aa;
+    --border-soft: #ffedd5;
+    --text-1: #1f2937;
+    --text-2: #4b5563;
+    --text-3: #6b7280;
+    --text-4: #9ca3af;
+    /* Rajat = silver. Jubilee accents layered over the warm base. */
+    --silver: #b8bcc4;
+    --silver-light: #e7e9ee;
+    --champagne: #e6d2a8;
+    --gold: #c79a3c;
+
+    --title-grad: linear-gradient(96deg, var(--orange-dark), var(--red-dark));
+    --btn-grad: linear-gradient(to right, var(--orange), var(--red));
+    --page-grad: linear-gradient(to bottom right, var(--cream-1), var(--cream-2), var(--cream-3));
+
+    --shadow-card: 0 10px 28px -10px rgba(124,45,18,0.18), 0 4px 10px -6px rgba(0,0,0,0.06);
+    --shadow-lift: 0 24px 60px -24px rgba(124,45,18,0.35);
+    --radius: 22px;
+
+    --font-display: "Instrument Serif", Georgia, serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --font-guj: "Noto Serif Gujarati", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--text-1);
+    background: #f4ede4;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { margin: 0; }
+  p { margin: 0; }
+
+  /* ============================================================
+     CHROME — the mock harness (not part of the page design)
+     ============================================================ */
+  .harness {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(28, 20, 16, 0.92);
+    backdrop-filter: blur(10px);
+    color: #f7ede2;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .harness-inner {
+    max-width: 1180px; margin: 0 auto; padding: 12px 20px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .harness-title {
+    font-family: var(--font-display); font-size: 1.45rem; line-height: 1;
+    letter-spacing: 0.2px; display: flex; align-items: baseline; gap: 10px;
+  }
+  .harness-title small {
+    font-family: var(--font-body); font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em; color: #e0a06a;
+  }
+  .seg {
+    display: flex; gap: 4px; background: rgba(255,255,255,0.06);
+    padding: 4px; border-radius: 12px; margin-left: auto;
+  }
+  .seg button {
+    font-family: var(--font-body); font-weight: 600; font-size: 0.82rem;
+    color: #d8cabb; background: transparent; border: 0; cursor: pointer;
+    padding: 7px 13px; border-radius: 9px; transition: all .18s ease; white-space: nowrap;
+  }
+  .seg button:hover { color: #fff; }
+  .seg button.active {
+    background: var(--btn-grad); color: #fff;
+    box-shadow: 0 4px 12px rgba(249,115,22,0.4);
+  }
+  .toggle-anno {
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+    font-size: 0.78rem; font-weight: 600; color: #d8cabb; user-select: none;
+  }
+  .toggle-anno input { accent-color: var(--orange); width: 15px; height: 15px; }
+
+  /* Annotation callout boxes describing each direction */
+  .notes {
+    max-width: 980px; margin: 26px auto 0; padding: 0 20px;
+  }
+  .notes-card {
+    background: #fffdfa; border: 1px solid var(--border-soft);
+    border-left: 4px solid var(--orange); border-radius: 14px;
+    padding: 16px 20px; box-shadow: 0 6px 18px -12px rgba(124,45,18,0.4);
+  }
+  .notes-card h4 {
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.16em; color: var(--orange-700);
+    margin-bottom: 8px;
+  }
+  .notes-card p { font-size: 0.92rem; line-height: 1.55; color: var(--text-2); }
+  .notes-card ul { margin: 8px 0 0; padding-left: 18px; }
+  .notes-card li { font-size: 0.88rem; line-height: 1.5; color: var(--text-2); margin-bottom: 3px; }
+  .notes-card b { color: var(--orange-900); }
+
+  /* ============================================================
+     PHOTO PLACEMENT ZONES — labeled drop targets
+     ============================================================ */
+  .photo {
+    position: relative; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    background:
+      repeating-linear-gradient(45deg, rgba(249,115,22,0.04) 0 12px, rgba(249,115,22,0.07) 12px 24px);
+    border: 2px dashed var(--orange); border-radius: 14px;
+    color: var(--orange-700); text-align: center; padding: 18px; overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  body.show-anno .photo::after {
+    content: "PHOTO ZONE"; position: absolute; top: 8px; right: 8px;
+    font-size: 0.56rem; font-weight: 800; letter-spacing: 0.12em;
+    background: var(--orange); color: #fff; padding: 3px 7px; border-radius: 6px;
+  }
+  .photo svg { width: 30px; height: 30px; opacity: 0.85; }
+  .photo .ph-label { font-size: 0.82rem; font-weight: 700; line-height: 1.3; }
+  .photo .ph-meta {
+    font-size: 0.68rem; font-weight: 600; color: var(--orange);
+    background: rgba(255,255,255,0.7); padding: 2px 9px; border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Polaroid framing used in a couple directions */
+  .polaroid {
+    background: #fff; padding: 10px 10px 34px; border-radius: 6px;
+    box-shadow: var(--shadow-card);
+  }
+  .polaroid .photo { border-radius: 4px; }
+  .polaroid .cap {
+    position: absolute; bottom: 9px; left: 0; right: 0; text-align: center;
+    font-family: var(--font-display); font-style: italic; font-size: 0.92rem;
+    color: var(--text-3);
+  }
+
+  /* ============================================================
+     SHARED PAGE PIECES
+     ============================================================ */
+  .stage { display: none; }
+  .stage.active { display: block; }
+
+  .grain::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  }
+
+  .eyebrow {
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.22em; color: var(--orange-700);
+  }
+  .display-title {
+    font-family: var(--font-display); font-weight: 400;
+    background: var(--title-grad); -webkit-background-clip: text;
+    background-clip: text; color: transparent; line-height: 1.04;
+  }
+  .lede { color: var(--text-2); line-height: 1.65; }
+
+  /* Form mock (stylized, represents the real fields) */
+  .form-card {
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.88), rgba(255,247,237,0.85));
+    border: 2px solid var(--border-orange);
+    box-shadow: var(--shadow-card); backdrop-filter: blur(6px);
+    border-radius: var(--radius); padding: 26px;
+  }
+  .form-card h3 { font-family: var(--font-display); font-size: 1.55rem; color: var(--text-1); text-align: center; }
+  .form-card .sub { text-align: center; color: var(--text-3); font-size: 0.9rem; margin-top: 2px; }
+  .step-head { display: flex; gap: 11px; align-items: flex-start; margin: 20px 0 12px; }
+  .step-num {
+    width: 26px; height: 26px; flex: none; border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    color: #fff; font-size: 0.78rem; font-weight: 800;
+    display: grid; place-items: center; box-shadow: 0 2px 6px rgba(249,115,22,0.4);
+  }
+  .step-head h4 { font-size: 1rem; font-weight: 700; color: var(--text-1); }
+  .step-head p { font-size: 0.78rem; color: var(--text-3); }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 0.85rem; font-weight: 600; color: var(--text-2); }
+  .field .input {
+    height: 46px; border: 1px solid var(--border-orange); border-radius: 9px;
+    background: rgba(255,255,255,0.65); display: flex; align-items: center;
+    padding: 0 13px; color: var(--text-4); font-size: 0.9rem;
+  }
+  .field .input.area { height: 78px; align-items: flex-start; padding-top: 11px; }
+  .btn-submit {
+    margin-top: 18px; width: 100%; height: 54px; border: 0; border-radius: 11px;
+    background: var(--btn-grad); color: #fff; font-family: var(--font-body);
+    font-weight: 700; font-size: 1rem; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -10px rgba(239,68,68,0.5); }
+  .privacy { font-size: 0.72rem; color: var(--text-4); line-height: 1.5; margin-top: 14px; }
+
+  /* fade/slide in on load */
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  .rise { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
+
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ============================================================
+     DIRECTION A — "LIVING ALBUM"
+     ============================================================ */
+  #A .a-bg {
+    position: relative; overflow: hidden;
+    background: var(--page-grad);
+    padding: 0 0 90px;
+  }
+  /* faint temple shikhar watermark */
+  #A .a-shikhar {
+    position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+    width: 620px; max-width: 92vw; opacity: 0.06; z-index: 0; pointer-events: none;
+  }
+  #A .a-hero { position: relative; z-index: 2; text-align: center; padding: 64px 0 0; }
+  #A .display-title { font-size: clamp(2.6rem, 6vw, 4.4rem); }
+  #A .a-hero .lede { max-width: 620px; margin: 18px auto 0; font-size: 1.05rem; }
+  /* fanned polaroid cluster */
+  #A .a-fan {
+    position: relative; height: 300px; margin: 30px auto 0; max-width: 760px;
+    z-index: 2;
+  }
+  #A .a-fan .polaroid {
+    position: absolute; top: 30px; left: 50%; width: 210px;
+    transition: transform .35s cubic-bezier(.2,.7,.2,1);
+  }
+  #A .a-fan .polaroid .photo { height: 180px; width: 100%; }
+  #A .a-fan .p1 { transform: translateX(-260px) rotate(-11deg); }
+  #A .a-fan .p2 { transform: translateX(-90px) rotate(-3deg) translateY(-10px); z-index: 3; }
+  #A .a-fan .p3 { transform: translateX(82px) rotate(4deg) translateY(-6px); z-index: 2; }
+  #A .a-fan .p4 { transform: translateX(252px) rotate(12deg); }
+  #A .a-fan:hover .p1 { transform: translateX(-300px) rotate(-15deg); }
+  #A .a-fan:hover .p4 { transform: translateX(292px) rotate(16deg); }
+  /* emotional reasons trio */
+  #A .a-why { position: relative; z-index: 2; margin-top: 70px; }
+  #A .a-why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 22px; }
+  #A .a-why-card {
+    background: rgba(255,255,255,0.7); border: 1px solid var(--border-soft);
+    border-radius: 16px; padding: 22px; text-align: center; backdrop-filter: blur(4px);
+  }
+  #A .a-why-card .ic {
+    width: 46px; height: 46px; margin: 0 auto 12px; border-radius: 13px;
+    background: linear-gradient(135deg, var(--cream-1), #ffe4cf);
+    display: grid; place-items: center; color: var(--orange-dark);
+  }
+  #A .a-why-card h5 { font-size: 1rem; color: var(--text-1); margin-bottom: 6px; }
+  #A .a-why-card p { font-size: 0.85rem; color: var(--text-3); line-height: 1.5; }
+  /* counter ribbon */
+  #A .a-counter {
+    position: relative; z-index: 2; margin: 60px auto 0; max-width: 760px;
+    background: linear-gradient(110deg, #fff3e6, #ffe9e9);
+    border: 1px solid var(--border-orange); border-radius: 18px;
+    padding: 22px 28px; text-align: center; box-shadow: var(--shadow-card);
+  }
+  #A .a-counter b { font-family: var(--font-display); font-size: 2.6rem; color: var(--orange-dark); display: block; line-height: 1; }
+  #A .a-counter span { font-size: 0.92rem; color: var(--text-2); }
+
+  /* ============================================================
+     DIRECTION B — "25 YEARS" (Silver Jubilee timeline)
+     ============================================================ */
+  #B .b-bg {
+    position: relative; overflow: hidden; padding: 0 0 90px;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(231,233,238,0.9), transparent 60%),
+      var(--page-grad);
+  }
+  #B .b-hero { text-align: center; padding: 66px 0 0; position: relative; z-index: 2; }
+  #B .b-silver-pill {
+    display: inline-flex; align-items: center; gap: 9px; padding: 8px 18px;
+    border-radius: 999px; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em;
+    color: #6b6f78; background: linear-gradient(120deg, var(--silver-light), #fff, var(--silver-light));
+    border: 1px solid var(--silver); box-shadow: 0 4px 14px -8px rgba(120,124,132,0.6);
+    text-transform: uppercase;
+  }
+  #B .display-title { font-size: clamp(2.5rem, 5.6vw, 4.1rem); margin-top: 18px; }
+  #B .b-hero .guj { font-family: var(--font-guj); font-size: 1.3rem; color: var(--orange-700); margin-top: 8px; }
+  #B .b-hero .lede { max-width: 640px; margin: 16px auto 0; font-size: 1.04rem; }
+  /* timeline ribbon */
+  #B .b-timeline { position: relative; z-index: 2; margin-top: 56px; }
+  #B .b-track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(210px, 1fr);
+    gap: 20px; overflow-x: auto; padding: 18px 4px 26px; scroll-snap-type: x mandatory;
+  }
+  #B .b-track::-webkit-scrollbar { height: 8px; }
+  #B .b-track::-webkit-scrollbar-thumb { background: var(--border-orange); border-radius: 999px; }
+  #B .b-node { scroll-snap-align: center; position: relative; padding-top: 26px; }
+  #B .b-node::before {
+    content: ""; position: absolute; top: 9px; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, var(--border-orange), transparent);
+  }
+  #B .b-node .dot {
+    position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--btn-grad); box-shadow: 0 0 0 4px #fff, 0 0 0 5px var(--border-orange);
+  }
+  #B .b-node .year {
+    text-align: center; font-family: var(--font-display); font-size: 1.5rem;
+    color: var(--orange-dark); margin-bottom: 10px;
+  }
+  #B .b-node .photo { height: 150px; }
+  #B .b-node .ev { text-align: center; font-size: 0.82rem; color: var(--text-3); margin-top: 9px; line-height: 1.4; }
+  #B .b-node.now .photo {
+    border-style: solid; border-color: var(--gold);
+    background: linear-gradient(135deg, #fff8ec, #fff);
+    color: var(--orange-900);
+  }
+  #B .b-node.now .year { color: var(--gold); }
+  #B .b-bridge {
+    position: relative; z-index: 2; text-align: center; max-width: 640px;
+    margin: 26px auto 0; font-family: var(--font-display); font-style: italic;
+    font-size: 1.35rem; color: var(--text-2); line-height: 1.4;
+  }
+
+  /* ============================================================
+     DIRECTION C — "EDITORIAL SPLIT"
+     ============================================================ */
+  #C .c-bg {
+    position: relative; overflow: hidden; padding: 60px 0 90px;
+    background:
+      radial-gradient(80% 60% at 12% 0%, rgba(255,237,213,0.8), transparent 55%),
+      radial-gradient(70% 60% at 100% 30%, rgba(254,226,226,0.7), transparent 55%),
+      var(--page-grad);
+  }
+  #C .c-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 48px; align-items: start; }
+  #C .c-left { position: sticky; top: 90px; }
+  #C .display-title { font-size: clamp(2.4rem, 4.6vw, 3.6rem); margin-top: 14px; }
+  #C .c-left .lede { font-size: 1.05rem; margin-top: 18px; max-width: 460px; }
+  /* rotating featured memory card */
+  #C .c-feature {
+    margin-top: 30px; background: #fff; border-radius: 18px; overflow: hidden;
+    box-shadow: var(--shadow-lift); border: 1px solid var(--border-soft); max-width: 440px;
+  }
+  #C .c-feature .photo { height: 230px; border: 0; border-radius: 0;
+    border-bottom: 2px dashed var(--orange); }
+  #C .c-feature .body { padding: 18px 20px 20px; }
+  #C .c-feature .body .q {
+    font-family: var(--font-display); font-style: italic; font-size: 1.15rem;
+    color: var(--text-1); line-height: 1.4;
+  }
+  #C .c-feature .attrib { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  #C .c-feature .attrib .av {
+    width: 38px; height: 38px; border-radius: 50%; flex: none;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 0.85rem;
+  }
+  #C .c-feature .attrib b { font-size: 0.88rem; color: var(--text-1); display: block; }
+  #C .c-feature .attrib span { font-size: 0.76rem; color: var(--text-3); }
+  #C .c-dots { display: flex; gap: 6px; margin-top: 16px; }
+  #C .c-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--border-orange); }
+  #C .c-dots i.on { width: 22px; border-radius: 999px; background: var(--orange); }
+
+  /* ============================================================
+     DIRECTION D — "IMMERSIVE HERO"
+     ============================================================ */
+  #D .d-hero {
+    position: relative; min-height: 520px; display: grid; place-items: center;
+    text-align: center; overflow: hidden;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  #D .d-hero .photo {
+    position: absolute; inset: 0; border-radius: 0; border-width: 3px;
+    border-color: rgba(249,115,22,0.5);
+  }
+  #D .d-hero .overlay {
+    position: absolute; inset: 0; z-index: 2;
+    background:
+      linear-gradient(to top, rgba(124,45,18,0.78), rgba(124,45,18,0.28) 45%, rgba(255,247,237,0.15));
+  }
+  #D .d-hero .inner { position: relative; z-index: 3; padding: 40px 24px; max-width: 760px; }
+  #D .d-hero .eyebrow { color: #ffd9b8; }
+  #D .d-hero .display-title {
+    color: #fff; -webkit-text-fill-color: #fff; background: none;
+    font-size: clamp(2.8rem, 6vw, 4.6rem); text-shadow: 0 4px 30px rgba(0,0,0,0.35);
+  }
+  #D .d-hero .lede { color: #ffe9d6; font-size: 1.1rem; max-width: 560px; margin: 18px auto 26px; }
+  #D .d-hero .scroll-cta {
+    display: inline-flex; align-items: center; gap: 9px; background: #fff; color: var(--orange-dark);
+    font-weight: 700; padding: 13px 26px; border-radius: 999px; text-decoration: none;
+    box-shadow: 0 12px 30px -8px rgba(0,0,0,0.4); font-size: 0.95rem;
+  }
+  #D .d-stats {
+    position: relative; z-index: 4; margin: -34px auto 0; max-width: 820px;
+    background: #fff; border: 1px solid var(--border-soft); border-radius: 18px;
+    box-shadow: var(--shadow-lift); display: grid; grid-template-columns: repeat(3,1fr);
+  }
+  #D .d-stats div { padding: 20px; text-align: center; border-right: 1px solid var(--border-soft); }
+  #D .d-stats div:last-child { border-right: 0; }
+  #D .d-stats b { font-family: var(--font-display); font-size: 2.1rem; color: var(--orange-dark); display: block; line-height: 1; }
+  #D .d-stats span { font-size: 0.8rem; color: var(--text-3); }
+  #D .d-body { background: var(--page-grad); padding: 70px 0 90px; position: relative; }
+  #D .d-section-title { text-align: center; margin-bottom: 8px; }
+  #D .d-section-title .display-title { font-size: 2.4rem; }
+  #D .d-masonry { columns: 3; column-gap: 16px; margin-top: 30px; }
+  #D .d-masonry .polaroid { break-inside: avoid; margin-bottom: 16px; transform: rotate(var(--r, 0deg)); }
+  #D .d-masonry .polaroid .photo { width: 100%; }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 860px) {
+    #A .a-why-grid { grid-template-columns: 1fr; }
+    #A .a-fan { height: 240px; }
+    #A .a-fan .polaroid { width: 150px; }
+    #A .a-fan .p1 { transform: translateX(-150px) rotate(-10deg); }
+    #A .a-fan .p4 { transform: translateX(150px) rotate(10deg); }
+    #C .c-grid { grid-template-columns: 1fr; gap: 30px; }
+    #C .c-left { position: static; }
+    #D .d-masonry { columns: 2; }
+    #D .d-stats { grid-template-columns: 1fr; }
+    #D .d-stats div { border-right: 0; border-bottom: 1px solid var(--border-soft); }
+    .fields { grid-template-columns: 1fr; }
+    .seg { width: 100%; overflow-x: auto; margin-left: 0; }
+  }
+</style>
+</head>
+<body class="show-anno">
+
+<!-- ===================== HARNESS / SWITCHER ===================== -->
+<div class="harness">
+  <div class="harness-inner">
+    <div class="harness-title">Share Memories <small>Design Directions</small></div>
+    <div class="seg" role="tablist">
+      <button data-stage="A" class="active">A · Living Album</button>
+      <button data-stage="B">B · 25 Years</button>
+      <button data-stage="C">C · Editorial Split</button>
+      <button data-stage="D">D · Immersive Hero</button>
+    </div>
+    <label class="toggle-anno">
+      <input type="checkbox" id="annoToggle" checked />
+      Show notes &amp; photo zones
+    </label>
+  </div>
+</div>
+
+<!-- ============================================================
+     DIRECTION A — LIVING ALBUM
+     ============================================================ -->
+<section class="stage active" id="A">
+  <div class="notes">
+    <div class="notes-card">
+      <h4>Direction A · Living Album</h4>
+      <p>Keeps your centered layout and warm theme, but turns the top of the page into a <b>photo album</b> that previews what people are sharing. The form stays exactly where it is, lower down.</p>
+      <ul>
+        <li><b>Background:</b> same cream gradient + a faint temple-shikhar line watermark and a light paper grain for warmth and texture (no flat white).</li>
+        <li><b>Hero:</b> a fanned cluster of polaroids behind the title (hover to spread them) so the page feels alive before anyone reads a word.</li>
+        <li><b>New content:</b> a 3-up "why share" strip and a families-shared counter to build momentum and trust before the form.</li>
+        <li><b>Photos you'd supply:</b> 4 hero polaroids (square) + any you want in the album. I can wire these to your Cloudflare CDN.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="a-bg grain">
+    <!-- faint temple watermark -->
+    <svg class="a-shikhar" viewBox="0 0 400 220" fill="none" stroke="var(--orange-900)" stroke-width="2">
+      <path d="M200 8 L188 40 L212 40 Z M200 40 L176 92 L224 92 Z M200 92 L160 165 L240 165 Z"/>
+      <path d="M120 165 L120 110 L150 95 L150 165 M280 165 L280 110 L250 95 L250 165"/>
+      <path d="M70 210 L330 210 L330 165 L70 165 Z"/>
+      <path d="M120 210 L120 175 L150 175 L150 210 M250 210 L250 175 L280 175 L280 210"/>
+    </svg>
+
+    <div class="container a-hero rise">
+      <span class="eyebrow">NJ Mandir · Rajat Mahotsav 2026</span>
+      <h1 class="display-title" style="margin-top:14px;">Share Your NJ&nbsp;Mandir Memories</h1>
+      <p class="lede">Every family has a moment at NJ Mandir worth remembering. Send us your photos and a few lines of story, and we'll feature your family, your ghaam, and your mandal across our channels.</p>
+
+      <div class="a-fan">
+        <div class="polaroid p1"><div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-label">Family at a past utsav</span><span class="ph-meta">1:1 · square</span></div><span class="cap">Diwali, 2019</span></div>
+        <div class="polaroid p2"><div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-label">Darshan moment</span><span class="ph-meta">1:1 · square</span></div><span class="cap">Patotsav</span></div>
+        <div class="polaroid p3"><div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-label">Seva day</span><span class="ph-meta">1:1 · square</span></div><span class="cap">Annakut</span></div>
+        <div class="polaroid p4"><div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-label">With Prem Murti Bapa</span><span class="ph-meta">1:1 · square</span></div><span class="cap">2012</span></div>
+      </div>
+    </div>
+
+    <div class="container a-why rise" style="animation-delay:.15s">
+      <div style="text-align:center"><span class="eyebrow">Why your memory matters</span></div>
+      <div class="a-why-grid">
+        <div class="a-why-card">
+          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+          <h5>Preserve the legacy</h5>
+          <p>Your photos become part of NJ Mandir's living history for generations to come.</p>
+        </div>
+        <div class="a-why-card">
+          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/><path d="M18 11h4M20 9v4"/></svg></div>
+          <h5>Be featured</h5>
+          <p>Selected memories appear on our social channels and in the event recap.</p>
+        </div>
+        <div class="a-why-card">
+          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+          <h5>Connect families</h5>
+          <p>Help families across mandals relive shared moments together.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="a-counter rise" style="animation-delay:.25s">
+        <b>240+</b>
+        <span>memories already shared by NJ Mandir families. Add yours below.</span>
+      </div>
+    </div>
+
+    <!-- form -->
+    <div class="container" style="position:relative; z-index:2; margin-top:54px;">
+      <div style="max-width:680px; margin:0 auto;">
+        <div class="form-card rise" style="animation-delay:.3s"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DIRECTION B — 25 YEARS (SILVER JUBILEE TIMELINE)
+     ============================================================ -->
+<section class="stage" id="B">
+  <div class="notes">
+    <div class="notes-card">
+      <h4>Direction B · 25 Years of Memories</h4>
+      <p>Leans into the meaning of <b>Rajat Mahotsav</b> (silver / 25th anniversary). It frames the page as a shared history: scroll through the mandir's milestones, then add your chapter. Strong emotional pull toward signing up.</p>
+      <ul>
+        <li><b>Background:</b> warm cream base with a soft <b>silver shimmer</b> at the top, tying the visual to the silver-jubilee theme without losing the orange identity.</li>
+        <li><b>Content hook:</b> a horizontal, swipeable <b>timeline ribbon</b> (e.g. 2001 → 2026) with one photo per milestone, ending on a highlighted "2026 · your memory" slot that leads into the form.</li>
+        <li><b>Photos you'd supply:</b> one landscape photo per milestone year. Even 5-6 strong archival shots make this sing.</li>
+        <li>Optional Gujarati subtitle line for authenticity (already in your font stack).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="b-bg grain">
+    <div class="container b-hero rise">
+      <span class="b-silver-pill">✦ Celebrating 25 Years ✦</span>
+      <h1 class="display-title">Twenty-Five Years of Memories</h1>
+      <div class="guj">તમારી યાદો અમારી સાથે વહેંચો</div>
+      <p class="lede">From the first murti pratishtha to today, NJ Mandir's story is written by its families. Walk through the years, then add the moment your family remembers most.</p>
+    </div>
+
+    <div class="container b-timeline rise" style="animation-delay:.15s">
+      <div class="b-track">
+        <div class="b-node">
+          <span class="dot"></span><div class="year">2001</div>
+          <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">3:2 · landscape</span></div>
+          <div class="ev">Mandir foundation &amp; first darshan</div>
+        </div>
+        <div class="b-node">
+          <span class="dot"></span><div class="year">2008</div>
+          <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">3:2 · landscape</span></div>
+          <div class="ev">First Patotsav celebration</div>
+        </div>
+        <div class="b-node">
+          <span class="dot"></span><div class="year">2015</div>
+          <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">3:2 · landscape</span></div>
+          <div class="ev">Community hall &amp; seva expansion</div>
+        </div>
+        <div class="b-node">
+          <span class="dot"></span><div class="year">2020</div>
+          <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">3:2 · landscape</span></div>
+          <div class="ev">Two decades of devotion</div>
+        </div>
+        <div class="b-node now">
+          <span class="dot"></span><div class="year">2026</div>
+          <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg><span class="ph-label">Your memory goes here</span><span class="ph-meta">add yours ↓</span></div>
+          <div class="ev"><b>Rajat Mahotsav · the next chapter</b></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="b-bridge rise" style="animation-delay:.2s">"Twenty-five years of moments, and yours is the one we're still missing."</p>
+
+    <div class="container" style="position:relative; z-index:2; margin-top:40px;">
+      <div style="max-width:680px; margin:0 auto;">
+        <div class="form-card rise" style="animation-delay:.3s"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DIRECTION C — EDITORIAL SPLIT
+     ============================================================ -->
+<section class="stage" id="C">
+  <div class="notes">
+    <div class="notes-card">
+      <h4>Direction C · Editorial Split</h4>
+      <p>A more modern, magazine-style layout. On desktop the <b>story lives on the left</b> (sticky) and the <b>form stays on the right</b>, always in view, so the call-to-action never scrolls away. On mobile it stacks back into your familiar centered flow.</p>
+      <ul>
+        <li><b>Background:</b> two soft corner glows (warm orange top-left, blush top-right) over the cream base, plus grain. Asymmetric and contemporary.</li>
+        <li><b>Content hook:</b> a <b>rotating "featured memory" card</b> with a real photo, a pull-quote from the story, and the family's name + ghaam, so visitors see a finished example as social proof.</li>
+        <li><b>Photos you'd supply:</b> 3-5 featured memories (photo + short quote) to rotate through the carousel.</li>
+        <li>Best fit if you want the form to feel effortless and always reachable.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="c-bg grain">
+    <div class="container">
+      <div class="c-grid">
+        <div class="c-left rise">
+          <span class="eyebrow">Share a memory</span>
+          <h1 class="display-title">Your story belongs on these walls too.</h1>
+          <p class="lede">Send us a photo and a few sentences. We'll display your family name, ghaam, mandal, and story together when we feature it across NJ Mandir's channels.</p>
+
+          <div class="c-feature">
+            <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-label">Featured family photo</span><span class="ph-meta">4:3 · landscape</span></div>
+            <div class="body">
+              <p class="q">"My grandfather helped lay the first bricks. Standing here with my own kids felt like closing a circle."</p>
+              <div class="attrib">
+                <div class="av">PP</div>
+                <div><b>Pankajbhai Patel &amp; Family</b><span>Mokhasan · New Jersey Mandal</span></div>
+              </div>
+              <div class="c-dots"><i class="on"></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="c-right rise" style="animation-delay:.15s">
+          <div class="form-card"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DIRECTION D — IMMERSIVE HERO
+     ============================================================ -->
+<section class="stage" id="D">
+  <div class="notes">
+    <div class="notes-card">
+      <h4>Direction D · Immersive Hero</h4>
+      <p>The boldest option: open with a <b>full-bleed hero photo</b> of the mandir with the headline laid over a warm gradient, then float a stats ribbon and a wall of community memories below. Highest "wow," needs one great wide photo.</p>
+      <ul>
+        <li><b>Background:</b> a single cinematic mandir/utsav photo behind the hero with an orange-to-deep gradient overlay so white text stays readable; cream gradient resumes below the fold.</li>
+        <li><b>Content hook:</b> floating <b>stat ribbon</b> (years, families, memories) for instant credibility, then a <b>masonry wall</b> of community memories as polaroids before the form.</li>
+        <li><b>Photos you'd supply:</b> 1 hero landscape (wide, high-res) + 6-9 community photos for the wall.</li>
+        <li>Most editorial / campaign-like; great if this page is promoted as a standalone link.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <div class="d-hero">
+      <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="overlay"></div>
+      <div class="inner rise">
+        <span class="eyebrow">NJ Mandir · Rajat Mahotsav 2026</span>
+        <h1 class="display-title">The mandir remembers every family.</h1>
+        <p class="lede">Share the photos and stories that made NJ Mandir home. We'll feature them as we celebrate 25 years together.</p>
+        <a href="#d-form" class="scroll-cta">Share your memory
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </a>
+      </div>
+      <div style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); z-index:3; color:#fff; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; opacity:.85;">★ HERO PHOTO ZONE · 16:9 wide, high-res ★</div>
+    </div>
+
+    <div class="container">
+      <div class="d-stats rise">
+        <div><b>25</b><span>years of devotion</span></div>
+        <div><b>240+</b><span>memories shared</span></div>
+        <div><b>14</b><span>mandals worldwide</span></div>
+      </div>
+    </div>
+
+    <div class="d-body grain">
+      <div class="container">
+        <div class="d-section-title rise">
+          <span class="eyebrow">From our community</span>
+          <h2 class="display-title">A wall of memories</h2>
+        </div>
+        <div class="d-masonry rise" style="animation-delay:.1s">
+          <div class="polaroid" style="--r:-2deg"><div class="photo" style="height:200px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">portrait</span></div><span class="cap">Patel family</span></div>
+          <div class="polaroid" style="--r:1.5deg"><div class="photo" style="height:150px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">landscape</span></div><span class="cap">Annakut seva</span></div>
+          <div class="polaroid" style="--r:-1deg"><div class="photo" style="height:170px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">square</span></div><span class="cap">Darshan, 2014</span></div>
+          <div class="polaroid" style="--r:2deg"><div class="photo" style="height:160px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">landscape</span></div><span class="cap">Shah family</span></div>
+          <div class="polaroid" style="--r:-1.5deg"><div class="photo" style="height:210px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">portrait</span></div><span class="cap">First visit</span></div>
+          <div class="polaroid" style="--r:1deg"><div class="photo" style="height:150px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="ph-meta">landscape</span></div><span class="cap">Patotsav 2019</span></div>
+        </div>
+
+        <div id="d-form" style="max-width:680px; margin:60px auto 0; scroll-margin-top:90px;">
+          <div class="form-card rise"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---- form mock injected into every .form-card so all 4 share one source ----
+  const formHTML = `
+    <h3>Submit a Memory</h3>
+    <p class="sub">A few quick details, then your photos. Takes about a minute.</p>
+
+    <div class="step-head"><span class="step-num">1</span><div><h4>About this memory</h4><p>Helps us caption your photos correctly.</p></div></div>
+    <div class="fields">
+      <div class="field"><label>Family Name *</label><div class="input">Pankajbhai Patel &amp; Family</div></div>
+      <div class="field"><label>Ghaam *</label><div class="input">Mokhasan</div></div>
+      <div class="field full"><label>Mandal *</label><div class="input">Select your mandal ▾</div></div>
+      <div class="field full"><label>Your caption / story *</label><div class="input area">Share your story in a few sentences…</div></div>
+    </div>
+
+    <div class="step-head"><span class="step-num">2</span><div><h4>Add your photos</h4><p>1 to 3 photos. Higher-quality originals look best.</p></div></div>
+    <div class="photo" style="height:120px; border-radius:12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+      <span class="ph-label">Drag &amp; drop or tap to upload</span>
+      <span class="ph-meta">user's own photos · up to 3</span>
+    </div>
+
+    <button class="btn-submit">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      Submit Memory
+    </button>
+    <p class="privacy">By submitting, you grant Shree Swaminarayan Temple Secaucus, New Jersey the right to publish, edit, and share your photos and story publicly across our channels, as we see fit. All submissions are reviewed before public display. Please only submit photos you have the right to share. We will not sell or share your contact information.</p>
+  `;
+  document.querySelectorAll('.form-card').forEach(el => el.innerHTML = formHTML);
+
+  // ---- variant switcher ----
+  const stages = document.querySelectorAll('.stage');
+  document.querySelectorAll('.seg button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      stages.forEach(s => s.classList.toggle('active', s.id === btn.dataset.stage));
+      // retrigger entrance animations
+      const active = document.getElementById(btn.dataset.stage);
+      active.querySelectorAll('.rise').forEach(n => { n.style.animation = 'none'; void n.offsetWidth; n.style.animation = ''; });
+      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    });
+  });
+
+  // ---- annotations / photo-zone label toggle ----
+  document.getElementById('annoToggle').addEventListener('change', e => {
+    document.body.classList.toggle('show-anno', e.target.checked);
+    document.querySelectorAll('.notes').forEach(n => n.style.display = e.target.checked ? '' : 'none');
+  });
+</script>
+</body>
+</html>
