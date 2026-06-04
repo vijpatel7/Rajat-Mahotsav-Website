@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/registration',
     '/invitation',
     '/latest-events',
+    '/tree-planting',
     '/schedule',
     '/community-seva',
     '/community-seva/submit-data',
