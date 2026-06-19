@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image as ImageIcon, CalendarCheck, Shield, FileText, BookA } from "lucide-react"
+import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image as ImageIcon, CalendarCheck, Shield, FileText, BookA, MapPinned, Camera } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { NavBar } from "@/components/organisms/tubelight-navbar"
 import { CDN_ASSETS } from "@/lib/cdn-assets"
@@ -37,14 +37,6 @@ const menuItems: NavigationItem[] = [
     iconColor: "text-blue-500",
   },
   {
-    icon: BookA,
-    label: "About the Mahotsav",
-    href: "/about",
-    gradient:
-      "radial-gradient(circle, rgba(14,165,233,0.15) 0%, rgba(2,132,199,0.06) 50%, rgba(14,116,144,0) 100%)",
-    iconColor: "text-sky-500",
-  },
-  {
     icon: ScrollText,
     label: "Timeline",
     href: "/timeline",
@@ -53,36 +45,39 @@ const menuItems: NavigationItem[] = [
     iconColor: "text-orange-500",
   },
   {
-    icon: ClipboardPen,
-    label: "Registration",
-    href: "/registration",
+    icon: MapPinned,
+    label: "Attend",
+    href: "#",
     gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(22,163,74,0.06) 50%, rgba(21,128,61,0) 100%)",
-    iconColor: "text-green-500",
-  },
-  {
-    icon: FileText,
-    label: "Invitation",
-    href: "/invitation",
-    gradient:
-      "radial-gradient(circle, rgba(251,191,36,0.18) 0%, rgba(245,158,11,0.07) 50%, rgba(217,119,6,0) 100%)",
-    iconColor: "text-amber-500",
-  },
-  {
-    icon: Hotel,
-    label: "Guest Services",
-    href: "/guest-services",
-    gradient:
-      "radial-gradient(circle, rgba(168,85,247,0.15) 0%, rgba(147,51,234,0.06) 50%, rgba(126,34,206,0) 100%)",
-    iconColor: "text-purple-500",
-  },
-  {
-    icon: CalendarDays,
-    label: "Schedule",
-    href: "/schedule",
-    gradient:
-      "radial-gradient(circle, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.06) 50%, rgba(185,28,28,0) 100%)",
-    iconColor: "text-red-500",
+      "radial-gradient(circle, rgba(20,184,166,0.15) 0%, rgba(13,148,136,0.06) 50%, rgba(15,118,110,0) 100%)",
+    iconColor: "text-teal-500",
+    subItems: [
+      {
+        icon: BookA,
+        label: "About the Mahotsav",
+        href: "/about",
+      },
+      {
+        icon: ClipboardPen,
+        label: "Registration",
+        href: "/registration",
+      },
+      {
+        icon: FileText,
+        label: "Invitation",
+        href: "/invitation",
+      },
+      {
+        icon: CalendarDays,
+        label: "Schedule",
+        href: "/schedule",
+      },
+      {
+        icon: Hotel,
+        label: "Guest Services",
+        href: "/guest-services",
+      },
+    ],
   },
   {
     icon: PiHandsPraying,
@@ -103,6 +98,14 @@ const menuItems: NavigationItem[] = [
         href: "/spiritual-seva",
       },
     ],
+  },
+  {
+    icon: Camera,
+    label: "Share Memories",
+    href: "/memories",
+    gradient:
+      "radial-gradient(circle, rgba(244,63,94,0.15) 0%, rgba(225,29,72,0.06) 50%, rgba(190,18,60,0) 100%)",
+    iconColor: "text-rose-500",
   },
   {
     icon: CalendarCheck,

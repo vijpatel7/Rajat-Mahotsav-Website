@@ -22,6 +22,15 @@ const nextConfig = {
     config.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^canvas$/ }))
     return config
   },
+  async redirects() {
+    return [
+      {
+        source: '/share-memories',
+        destination: '/memories',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
