@@ -298,27 +298,34 @@ export default function ShareMemoriesPage() {
         <div className="relative z-10 mx-auto max-w-7xl px-4 page-bottom-spacing sm:px-6 lg:px-8">
           {/* Hero */}
           <div className="text-center page-header-spacing">
+            <motion.span
+              className="mb-4 inline-block text-xs font-extrabold uppercase tracking-[0.22em] text-orange-700"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
+              Rajat Mahotsav · 2001 – 2026
+            </motion.span>
+
             <motion.h1
-              className="standard-page-title reg-title"
+              className="reg-title font-instrument-serif text-5xl leading-[1.05] md:text-6xl lg:text-7xl"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
             >
-              Share Your NJ Mandir Memories
+              {"NJ Mandir's 25 Year History, Told By You"}
             </motion.h1>
 
             <motion.div
-              className="mt-8 flex justify-center px-4"
+              className="mt-7 flex justify-center px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              <p className="max-w-3xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
-                Share your memories with NJ Mandir. Send us photos of yourself
-                or your family from past celebrations and events along with a
-                short story. When featured on our channels, we will display your
-                name, ghaam, mandal, your photos, and your story
-                together.
+              <p className="max-w-2xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
+                {
+                  "NJ Mandir's 25 year story belongs to all of us. This summer, as we gather for the Rajat Mahotsav, help us bring that story to life. Share your photos, your favorite memories, and the moments you carry with you."
+                }
               </p>
             </motion.div>
           </div>

@@ -528,7 +528,7 @@ export function AdminContentSubmissionsView({
             onPrev={goPrev}
             onNext={goNext}
             emptyTitle="No submissions yet"
-            emptyDescription="Once memories are submitted at /share-memories, they'll appear here for review."
+            emptyDescription="Once memories are submitted at /memories, they'll appear here for review."
             minWidthClassName="min-w-[920px]"
             totalRowsLabel={
               totalCount !== null ? (

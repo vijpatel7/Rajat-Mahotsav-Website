@@ -32,7 +32,7 @@ const menuItems = [
       { icon: PiHandsPraying, label: "Spiritual Seva", href: "/spiritual-seva" },
     ]
   },
-  { icon: Camera, label: "Share Memories", href: "/share-memories" },
+  { icon: Camera, label: "Share Memories", href: "/memories" },
   { icon: CalendarCheck, label: "Latest Events", href: "/latest-events" },
   { icon: Image, label: "Media", href: "/media" },
 ]

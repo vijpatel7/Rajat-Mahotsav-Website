@@ -102,7 +102,7 @@ const menuItems: NavigationItem[] = [
   {
     icon: Camera,
     label: "Share Memories",
-    href: "/share-memories",
+    href: "/memories",
     gradient:
       "radial-gradient(circle, rgba(244,63,94,0.15) 0%, rgba(225,29,72,0.06) 50%, rgba(190,18,60,0) 100%)",
     iconColor: "text-rose-500",

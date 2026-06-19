@@ -12,8 +12,10 @@ const ALLOWED_TYPES = new Set([
 ])
 const MAX_FILE_BYTES = 5 * 1024 * 1024
 const MAX_FILES = 3
-// Unique R2 prefix for /share-memories submissions; intentionally not shared
+// Unique R2 prefix for /memories submissions; intentionally not shared
 // with cs_personal_submissions, hotels, audio_files, wallpapers, or anything else.
+// NOTE: keep this value as "share-memories" even though the route moved to
+// /memories — changing it would orphan already-uploaded objects in R2.
 const FOLDER_PREFIX = "share-memories"
 const PRESIGNED_TTL_SECONDS = 600
 
