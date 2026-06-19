@@ -252,6 +252,7 @@ export function Navigation() {
             }))}
               availableInlineWidth={availableInlineWidth}
               inlineSafetyBuffer={24}
+              autoExpandPaths={["/memories"]}
             />
           </div>
 
