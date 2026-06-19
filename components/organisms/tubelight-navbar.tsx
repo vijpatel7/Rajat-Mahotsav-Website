@@ -22,6 +22,8 @@ interface NavBarProps {
   availableInlineWidth?: number
   inlineSafetyBuffer?: number
   forceOverlayMode?: boolean
+  /** Routes where the desktop toolbar should auto-expand on entry. */
+  autoExpandPaths?: string[]
 }
 
 const DESKTOP_BREAKPOINT = 1024
@@ -32,6 +34,7 @@ export function NavBar({
   availableInlineWidth,
   inlineSafetyBuffer = 24,
   forceOverlayMode,
+  autoExpandPaths,
 }: NavBarProps) {
   const pathname = usePathname()
   const menuPanelId = "primary-nav-panel"
@@ -122,6 +125,17 @@ export function NavBar({
 
     previousOverlayModeRef.current = usesOverlayMenu
   }, [usesOverlayMenu])
+
+  const shouldAutoExpand = autoExpandPaths?.includes(pathname) ?? false
+
+  // On configured routes (e.g. /memories), open the desktop toolbar on entry
+  // even if the user had previously collapsed it. Mobile keeps the overlay
+  // menu closed so it doesn't cover the page.
+  useEffect(() => {
+    if (shouldAutoExpand && !usesOverlayMenu) {
+      setIsExpanded(true)
+    }
+  }, [shouldAutoExpand, usesOverlayMenu])
 
   useEffect(() => {
     if (!isExpanded && !expandedItem && !hoveredItem) {
