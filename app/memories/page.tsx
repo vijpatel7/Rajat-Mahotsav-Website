@@ -43,6 +43,7 @@ import {
   MAX_VIDEO_DURATION_SECONDS,
   MIN_MEDIA_ITEMS,
 } from "@/lib/memories-upload-config"
+import { readVideoDurationSeconds } from "@/lib/memories-upload-client"
 import "@/styles/registration-theme.css"
 import "@/styles/share-memories-theme.css"
 
@@ -127,28 +128,6 @@ type MandalOption = { value: string; label: string; country: string }
 
 function toStored(display: string): string {
   return display.toLowerCase().replace(/ /g, "-")
-}
-
-/**
- * Read a video's playback length (rounded seconds) in the browser. The upload
- * zone already validates the limit; this captures the value to store on the
- * record. Returns 0 if the duration can't be read for any reason.
- */
-function readVideoDurationSeconds(file: File): Promise<number> {
-  return new Promise((resolve) => {
-    const url = URL.createObjectURL(file)
-    const video = document.createElement("video")
-    video.preload = "metadata"
-    video.muted = true
-    const finish = (value: number) => {
-      URL.revokeObjectURL(url)
-      resolve(value)
-    }
-    video.onloadedmetadata = () =>
-      finish(Number.isFinite(video.duration) ? Math.round(video.duration) : 0)
-    video.onerror = () => finish(0)
-    video.src = url
-  })
 }
 
 function buildMandalOptions(): { country: string; items: MandalOption[] }[] {

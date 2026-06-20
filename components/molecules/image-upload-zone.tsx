@@ -4,11 +4,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ImagePlus, UploadCloud, X } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
+import {
+  IMAGE_ACCEPT_ATTR,
+  IMAGE_ALLOWED_TYPES,
+  MAX_IMAGES,
+  MAX_IMAGE_BYTES,
+} from "@/lib/memories-upload-config"
 
-const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic", "image/heif"]
-const ACCEPT_ATTR = ".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
-const MAX_FILE_BYTES = 5 * 1024 * 1024
-const MAX_FILES = 3
+const ACCEPTED_TYPES = IMAGE_ALLOWED_TYPES as readonly string[]
+const ACCEPT_ATTR = IMAGE_ACCEPT_ATTR
+const MAX_FILE_BYTES = MAX_IMAGE_BYTES
+const MAX_FILES = MAX_IMAGES
 
 type ImageUploadZoneProps = {
   value: File[]
@@ -24,7 +30,8 @@ function validateFile(file: File): string | null {
     ACCEPTED_TYPES.includes(file.type.toLowerCase()) ||
     /\.(jpe?g|png|heic|heif)$/i.test(file.name)
   if (!isAcceptedType) return `${file.name}: only JPG, PNG, or HEIC files are allowed.`
-  if (file.size > MAX_FILE_BYTES) return `${file.name}: file is larger than 5MB.`
+  if (file.size > MAX_FILE_BYTES)
+    return `${file.name}: file is larger than ${formatBytes(MAX_FILE_BYTES)}.`
   return null
 }
 
@@ -158,13 +165,13 @@ export default function ImageUploadZone({
         <div className="space-y-1">
           <p className="text-sm font-medium text-gray-800 sm:text-base">
             {reachedMax
-              ? "Maximum of 3 photos added"
+              ? `Maximum of ${maxFiles} photos added`
               : isDragging
                 ? "Drop your photos here"
                 : "Tap to add photos, or drag and drop"}
           </p>
           <p className="text-xs text-gray-500 sm:text-sm">
-            JPG, PNG, or HEIC, up to 5MB each, {maxFiles} photos max
+            JPG, PNG, or HEIC, up to {formatBytes(MAX_FILE_BYTES)} each, {maxFiles} photos max
           </p>
         </div>
         <p className="mt-1 text-xs font-medium text-orange-700">

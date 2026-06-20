@@ -12,6 +12,7 @@ import {
   VIDEO_ALLOWED_TYPES,
   formatDuration,
 } from "@/lib/memories-upload-config"
+import { readVideoDurationSeconds } from "@/lib/memories-upload-client"
 
 type VideoUploadZoneProps = {
   value: File[]
@@ -28,31 +29,6 @@ function isAcceptedType(file: File): boolean {
       file.type.toLowerCase()
     ) || /\.(mp4|mov)$/i.test(file.name)
   )
-}
-
-/** Read the playback duration (seconds) of a video file in the browser. */
-function readVideoDuration(file: File): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const video = document.createElement("video")
-    video.preload = "metadata"
-    video.muted = true
-    const cleanup = () => URL.revokeObjectURL(url)
-    video.onloadedmetadata = () => {
-      const duration = video.duration
-      cleanup()
-      if (!Number.isFinite(duration) || duration <= 0) {
-        reject(new Error("Could not read this video's length."))
-        return
-      }
-      resolve(duration)
-    }
-    video.onerror = () => {
-      cleanup()
-      reject(new Error("This video format can't be read in the browser."))
-    }
-    video.src = url
-  })
 }
 
 export default function VideoUploadZone({
@@ -112,21 +88,18 @@ export default function VideoUploadZone({
             )
             continue
           }
-          try {
-            const duration = await readVideoDuration(file)
-            if (duration > MAX_VIDEO_DURATION_SECONDS + 0.5) {
-              setError(
-                `${file.name}: video is ${formatDuration(
-                  duration
-                )} long. Please keep it under ${MAX_VIDEO_DURATION_SECONDS} seconds.`
-              )
-              continue
-            }
-          } catch (err) {
+          const duration = await readVideoDurationSeconds(file)
+          if (!duration) {
             setError(
-              err instanceof Error
-                ? err.message
-                : "Could not read this video's length."
+              `${file.name}: this video's length couldn't be read in the browser.`
+            )
+            continue
+          }
+          if (duration > MAX_VIDEO_DURATION_SECONDS) {
+            setError(
+              `${file.name}: video is ${formatDuration(
+                duration
+              )} long. Please keep it under ${MAX_VIDEO_DURATION_SECONDS} seconds.`
             )
             continue
           }
