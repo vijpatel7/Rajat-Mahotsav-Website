@@ -23,6 +23,11 @@ const PRESIGNED_TTL_SECONDS = 3600
 const s3Client = new S3Client({
   region: "auto",
   endpoint: process.env.R2_ENDPOINT as string,
+  // aws-sdk v3 (>= ~3.729) injects a CRC32 checksum into presigned PUT URLs by
+  // default, computed over an empty body. R2 then rejects the real upload as a
+  // signature/checksum mismatch. WHEN_REQUIRED disables that default so the
+  // browser's plain PUT (Content-Type only) matches the signed request.
+  requestChecksumCalculation: "WHEN_REQUIRED",
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
