@@ -15,6 +15,7 @@ import {
   Download,
   Eye,
   ExternalLink,
+  Film,
   Filter,
   Loader2,
   Mail,
@@ -48,8 +49,10 @@ import { useToast } from "@/hooks/use-toast"
 import {
   type ContentImageKey,
   type ContentSubmissionRow,
+  type ContentVideoKey,
   publicUrlForKey,
 } from "@/lib/content-submissions-admin"
+import { formatDuration } from "@/lib/memories-upload-config"
 import { mandalStoredToDisplay, getAllMandalOptionsStored } from "@/lib/mandal-options"
 import { formatBytes } from "@/lib/utils"
 import {
@@ -330,12 +333,31 @@ export function AdminContentSubmissionsView({
       ),
     },
     {
-      key: "photos",
-      header: "Photos",
-      className: "w-16 text-center py-3 px-2 font-semibold reg-text-primary",
+      key: "media",
+      header: "Media",
+      className: "w-20 text-center py-3 px-2 font-semibold reg-text-primary",
       cellClassName:
         "py-2.5 px-2 text-center text-sm font-medium tabular-nums reg-text-primary",
-      render: (row) => row.image_keys?.length ?? 0,
+      render: (row) => {
+        const photos = row.image_keys?.length ?? 0
+        const videos = row.video_keys?.length ?? 0
+        return (
+          <span className="inline-flex items-center justify-center gap-1.5">
+            <span title={`${photos} photo${photos === 1 ? "" : "s"}`}>
+              {photos}
+            </span>
+            {videos > 0 && (
+              <span
+                className="inline-flex items-center gap-0.5 text-orange-700"
+                title={`${videos} video${videos === 1 ? "" : "s"}`}
+              >
+                <Film className="size-3.5" />
+                {videos}
+              </span>
+            )}
+          </span>
+        )
+      },
     },
     {
       key: "submitted",
@@ -650,6 +672,18 @@ function SubmissionDetailDialog({
             </ul>
           </section>
 
+          {/* Videos */}
+          {(row.video_keys?.length ?? 0) > 0 && (
+            <section>
+              <SectionLabel>Videos ({row.video_keys.length})</SectionLabel>
+              <ul className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {(row.video_keys ?? []).map((video) => (
+                  <VideoTile key={video.key} video={video} />
+                ))}
+              </ul>
+            </section>
+          )}
+
           {/* Caption */}
           <section>
             <div className="flex items-center justify-between">
@@ -798,6 +832,61 @@ function ImageTile({
               <Download className="size-3.5" />
             )}
           </button>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+function VideoTile({ video }: { video: ContentVideoKey }) {
+  const url = publicUrlForKey(video.key)
+  const sizeLabel = formatBytes(video.size_bytes)
+  const durationLabel = video.duration_seconds
+    ? formatDuration(video.duration_seconds)
+    : null
+
+  return (
+    <li className="overflow-hidden rounded-xl border border-orange-100 bg-white shadow-sm">
+      <div className="aspect-video w-full overflow-hidden bg-black">
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          src={url}
+          controls
+          playsInline
+          preload="metadata"
+          className="h-full w-full bg-black object-contain"
+        />
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gray-600">
+        <div className="min-w-0">
+          <p className="truncate" title={video.filename}>
+            {video.filename}
+          </p>
+          <p className="text-[10px] text-gray-400">
+            {durationLabel ? `${durationLabel} · ` : ""}
+            {sizeLabel}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open video in new tab"
+            title="Open in new tab"
+            className="inline-flex size-7 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 hover:text-orange-900"
+          >
+            <ExternalLink className="size-3.5" />
+          </a>
+          <a
+            href={url}
+            download={video.filename}
+            aria-label="Download video"
+            title="Download"
+            className="inline-flex size-7 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 hover:text-orange-900"
+          >
+            <Download className="size-3.5" />
+          </a>
         </div>
       </div>
     </li>

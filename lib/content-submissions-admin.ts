@@ -20,6 +20,14 @@ export type ContentImageKey = {
   size_bytes: number
 }
 
+export type ContentVideoKey = {
+  key: string
+  filename: string
+  content_type: string
+  size_bytes: number
+  duration_seconds: number
+}
+
 export type ContentSubmissionRow = {
   id: string
   created_at: string
@@ -29,6 +37,7 @@ export type ContentSubmissionRow = {
   mandal: string
   caption: string
   image_keys: ContentImageKey[]
+  video_keys: ContentVideoKey[]
   uploader_name: string | null
   uploader_email: string | null
   uploader_phone_country_code: string | null
@@ -47,6 +56,7 @@ export const CONTENT_SUBMISSION_COLUMNS: (keyof ContentSubmissionRow)[] = [
   "mandal",
   "caption",
   "image_keys",
+  "video_keys",
   "uploader_name",
   "uploader_email",
   "uploader_phone_country_code",

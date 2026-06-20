@@ -2,21 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ImagePlus, UploadCloud, X } from "lucide-react"
+import { Film, Loader2, UploadCloud, X } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
 import {
-  IMAGE_ACCEPT_ATTR,
-  IMAGE_ALLOWED_TYPES,
-  MAX_IMAGES,
-  MAX_IMAGE_BYTES,
+  MAX_VIDEOS,
+  MAX_VIDEO_BYTES,
+  MAX_VIDEO_DURATION_SECONDS,
+  VIDEO_ACCEPT_ATTR,
+  VIDEO_ALLOWED_TYPES,
+  formatDuration,
 } from "@/lib/memories-upload-config"
+import { readVideoDurationSeconds } from "@/lib/memories-upload-client"
 
-const ACCEPTED_TYPES = IMAGE_ALLOWED_TYPES as readonly string[]
-const ACCEPT_ATTR = IMAGE_ACCEPT_ATTR
-const MAX_FILE_BYTES = MAX_IMAGE_BYTES
-const MAX_FILES = MAX_IMAGES
-
-type ImageUploadZoneProps = {
+type VideoUploadZoneProps = {
   value: File[]
   onChange: (files: File[]) => void
   maxFiles?: number
@@ -25,25 +23,24 @@ type ImageUploadZoneProps = {
 
 type Preview = { file: File; url: string }
 
-function validateFile(file: File): string | null {
-  const isAcceptedType =
-    ACCEPTED_TYPES.includes(file.type.toLowerCase()) ||
-    /\.(jpe?g|png|heic|heif)$/i.test(file.name)
-  if (!isAcceptedType) return `${file.name}: only JPG, PNG, or HEIC files are allowed.`
-  if (file.size > MAX_FILE_BYTES)
-    return `${file.name}: file is larger than ${formatBytes(MAX_FILE_BYTES)}.`
-  return null
+function isAcceptedType(file: File): boolean {
+  return (
+    (VIDEO_ALLOWED_TYPES as readonly string[]).includes(
+      file.type.toLowerCase()
+    ) || /\.(mp4|mov)$/i.test(file.name)
+  )
 }
 
-export default function ImageUploadZone({
+export default function VideoUploadZone({
   value,
   onChange,
-  maxFiles = MAX_FILES,
+  maxFiles = MAX_VIDEOS,
   id,
-}: ImageUploadZoneProps) {
+}: VideoUploadZoneProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [checking, setChecking] = useState(false)
 
   const previews = useMemo<Preview[]>(
     () => value.map((file) => ({ file, url: URL.createObjectURL(file) })),
@@ -60,42 +57,73 @@ export default function ImageUploadZone({
   const reachedMax = remainingSlots === 0
 
   const addFiles = useCallback(
-    (incoming: FileList | File[]) => {
+    async (incoming: FileList | File[]) => {
       setError(null)
       const list = Array.from(incoming)
       if (list.length === 0) return
 
-      const accepted: File[] = []
-      const errors: string[] = []
-      for (const file of list) {
-        const err = validateFile(file)
-        if (err) {
-          errors.push(err)
-          continue
-        }
-        accepted.push(file)
+      const slots = Math.max(0, maxFiles - value.length)
+      if (slots === 0) {
+        setError(
+          `You can add up to ${maxFiles} video${maxFiles === 1 ? "" : "s"}.`
+        )
+        return
       }
 
-      const slots = Math.max(0, maxFiles - value.length)
-      if (accepted.length > slots) {
-        errors.push(`You can only add ${slots} more photo${slots === 1 ? "" : "s"}.`)
+      // Only consider as many as we have room for.
+      const candidates = list.slice(0, slots)
+      const accepted: File[] = []
+      setChecking(true)
+      try {
+        for (const file of candidates) {
+          if (!isAcceptedType(file)) {
+            setError(`${file.name}: only MP4 or MOV videos are allowed.`)
+            continue
+          }
+          if (file.size > MAX_VIDEO_BYTES) {
+            setError(
+              `${file.name}: video is larger than ${formatBytes(
+                MAX_VIDEO_BYTES
+              )}.`
+            )
+            continue
+          }
+          const duration = await readVideoDurationSeconds(file)
+          if (!duration) {
+            setError(
+              `${file.name}: this video's length couldn't be read in the browser.`
+            )
+            continue
+          }
+          if (duration > MAX_VIDEO_DURATION_SECONDS) {
+            setError(
+              `${file.name}: video is ${formatDuration(
+                duration
+              )} long. Please keep it under ${MAX_VIDEO_DURATION_SECONDS} seconds.`
+            )
+            continue
+          }
+          accepted.push(file)
+        }
+      } finally {
+        setChecking(false)
       }
-      const next = [...value, ...accepted.slice(0, slots)]
-      onChange(next)
-      if (errors.length > 0) setError(errors[0])
+
+      if (accepted.length > 0) {
+        onChange([...value, ...accepted].slice(0, maxFiles))
+      }
     },
     [maxFiles, onChange, value]
   )
 
   const removeAt = (index: number) => {
     setError(null)
-    const next = value.filter((_, i) => i !== index)
-    onChange(next)
+    onChange(value.filter((_, i) => i !== index))
   }
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    addFiles(e.target.files)
+    void addFiles(e.target.files)
     // reset so the same file can be re-selected after removal
     e.target.value = ""
   }
@@ -103,22 +131,24 @@ export default function ImageUploadZone({
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
-    if (reachedMax) return
+    if (reachedMax || checking) return
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      addFiles(e.dataTransfer.files)
+      void addFiles(e.dataTransfer.files)
     }
   }
+
+  const disabled = reachedMax || checking
 
   return (
     <div className="space-y-3">
       <div
         onDragEnter={(e) => {
           e.preventDefault()
-          if (!reachedMax) setIsDragging(true)
+          if (!disabled) setIsDragging(true)
         }}
         onDragOver={(e) => {
           e.preventDefault()
-          if (!reachedMax) setIsDragging(true)
+          if (!disabled) setIsDragging(true)
         }}
         onDragLeave={(e) => {
           e.preventDefault()
@@ -127,13 +157,13 @@ export default function ImageUploadZone({
         }}
         onDrop={onDrop}
         onClick={() => {
-          if (!reachedMax) inputRef.current?.click()
+          if (!disabled) inputRef.current?.click()
         }}
         role="button"
-        tabIndex={reachedMax ? -1 : 0}
-        aria-disabled={reachedMax}
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
         onKeyDown={(e) => {
-          if ((e.key === "Enter" || e.key === " ") && !reachedMax) {
+          if ((e.key === "Enter" || e.key === " ") && !disabled) {
             e.preventDefault()
             inputRef.current?.click()
           }
@@ -141,7 +171,7 @@ export default function ImageUploadZone({
         className={[
           "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-all duration-200",
           "bg-white/60 backdrop-blur-sm",
-          reachedMax
+          disabled
             ? "cursor-not-allowed border-orange-200/70 opacity-60"
             : "cursor-pointer hover:border-orange-300 hover:bg-orange-50/40",
           isDragging
@@ -153,25 +183,34 @@ export default function ImageUploadZone({
           ref={inputRef}
           id={id}
           type="file"
-          accept={ACCEPT_ATTR}
-          multiple
+          accept={VIDEO_ACCEPT_ATTR}
           className="sr-only"
           onChange={onInputChange}
-          disabled={reachedMax}
+          disabled={disabled}
         />
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-100 text-orange-600 shadow-sm">
-          {isDragging ? <UploadCloud className="h-6 w-6" /> : <ImagePlus className="h-6 w-6" />}
+          {checking ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+          ) : isDragging ? (
+            <UploadCloud className="h-6 w-6" />
+          ) : (
+            <Film className="h-6 w-6" />
+          )}
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium text-gray-800 sm:text-base">
-            {reachedMax
-              ? `Maximum of ${maxFiles} photos added`
-              : isDragging
-                ? "Drop your photos here"
-                : "Tap to add photos, or drag and drop"}
+            {checking
+              ? "Checking your video…"
+              : reachedMax
+                ? `Maximum of ${maxFiles} video${maxFiles === 1 ? "" : "s"} added`
+                : isDragging
+                  ? "Drop your video here"
+                  : "Tap to add a video, or drag and drop"}
           </p>
           <p className="text-xs text-gray-500 sm:text-sm">
-            JPG, PNG, or HEIC, up to {formatBytes(MAX_FILE_BYTES)} each, {maxFiles} photos max
+            MP4 or MOV, up to {MAX_VIDEO_DURATION_SECONDS}s and{" "}
+            {formatBytes(MAX_VIDEO_BYTES)}
+            {maxFiles > 1 ? `, ${maxFiles} videos max` : ""}
           </p>
         </div>
         <p className="mt-1 text-xs font-medium text-orange-700">
@@ -194,7 +233,7 @@ export default function ImageUploadZone({
       </AnimatePresence>
 
       {previews.length > 0 && (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3">
           <AnimatePresence initial={false}>
             {previews.map((p, index) => (
               <motion.li
@@ -206,12 +245,14 @@ export default function ImageUploadZone({
                 transition={{ duration: 0.18 }}
                 className="group relative overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-sm"
               >
-                <div className="aspect-[4/3] w-full overflow-hidden bg-orange-50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="aspect-video w-full overflow-hidden bg-black">
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video
                     src={p.url}
-                    alt={p.file.name}
-                    className="h-full w-full object-cover"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full bg-black object-contain"
                   />
                 </div>
                 <button

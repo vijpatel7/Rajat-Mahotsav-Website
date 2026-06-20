@@ -2,26 +2,32 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { randomUUID } from "crypto"
 import type { NextRequest } from "next/server"
+import {
+  MAX_IMAGES,
+  MAX_IMAGE_BYTES,
+  MAX_VIDEOS,
+  MAX_VIDEO_BYTES,
+  mediaKindForType,
+  type MediaKind,
+} from "@/lib/memories-upload-config"
 
-const ALLOWED_TYPES = new Set([
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/heic",
-  "image/heif",
-])
-const MAX_FILE_BYTES = 5 * 1024 * 1024
-const MAX_FILES = 3
 // Unique R2 prefix for /memories submissions; intentionally not shared
 // with cs_personal_submissions, hotels, audio_files, wallpapers, or anything else.
 // NOTE: keep this value as "share-memories" even though the route moved to
 // /memories — changing it would orphan already-uploaded objects in R2.
 const FOLDER_PREFIX = "share-memories"
-const PRESIGNED_TTL_SECONDS = 600
+// Videos can be large and phone upload connections slow, so give the presigned
+// URL plenty of time to finish the direct-to-R2 PUT before it expires.
+const PRESIGNED_TTL_SECONDS = 3600
 
 const s3Client = new S3Client({
   region: "auto",
   endpoint: process.env.R2_ENDPOINT as string,
+  // aws-sdk v3 (>= ~3.729) injects a CRC32 checksum into presigned PUT URLs by
+  // default, computed over an empty body. R2 then rejects the real upload as a
+  // signature/checksum mismatch. WHEN_REQUIRED disables that default so the
+  // browser's plain PUT (Content-Type only) matches the signed request.
+  requestChecksumCalculation: "WHEN_REQUIRED",
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
@@ -43,6 +49,7 @@ type UploadUrl = {
   key: string
   filename: string
   content_type: string
+  kind: MediaKind
 }
 
 type ResponsePayload = {
@@ -53,7 +60,7 @@ type ResponsePayload = {
 
 function sanitizeFilename(name: string): string {
   const trimmed = name.trim().replace(/\s+/g, "_")
-  return trimmed.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "image"
+  return trimmed.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "media"
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
@@ -67,13 +74,9 @@ export async function POST(request: NextRequest): Promise<Response> {
         { status: 400 }
       )
     }
-    if (files.length > MAX_FILES) {
-      return Response.json(
-        { error: `You can upload up to ${MAX_FILES} files.` } satisfies ResponsePayload,
-        { status: 400 }
-      )
-    }
 
+    // Validate each file and tag it with its media kind.
+    const tagged: { file: FileMetadata; kind: MediaKind }[] = []
     for (const f of files) {
       if (!f?.name || !f?.type) {
         return Response.json(
@@ -81,26 +84,48 @@ export async function POST(request: NextRequest): Promise<Response> {
           { status: 400 }
         )
       }
-      if (!ALLOWED_TYPES.has(f.type.toLowerCase())) {
+      const kind = mediaKindForType(f.type)
+      if (!kind) {
         return Response.json(
           {
-            error: `Unsupported file type: ${f.type}. Allowed: JPG, PNG, HEIC.`,
+            error: `Unsupported file type: ${f.type}. Allowed: JPG, PNG, HEIC, MP4, MOV.`,
           } satisfies ResponsePayload,
           { status: 400 }
         )
       }
-      if (typeof f.size === "number" && f.size > MAX_FILE_BYTES) {
+      const maxBytes = kind === "video" ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+      if (typeof f.size === "number" && f.size > maxBytes) {
+        const limitMb = Math.round(maxBytes / (1024 * 1024))
         return Response.json(
-          { error: `${f.name} is larger than 5MB.` } satisfies ResponsePayload,
+          { error: `${f.name} is larger than ${limitMb}MB.` } satisfies ResponsePayload,
           { status: 400 }
         )
       }
+      tagged.push({ file: f, kind })
+    }
+
+    const imageCount = tagged.filter((t) => t.kind === "image").length
+    const videoCount = tagged.filter((t) => t.kind === "video").length
+
+    if (imageCount > MAX_IMAGES) {
+      return Response.json(
+        { error: `You can upload up to ${MAX_IMAGES} photos.` } satisfies ResponsePayload,
+        { status: 400 }
+      )
+    }
+    if (videoCount > MAX_VIDEOS) {
+      return Response.json(
+        {
+          error: `You can upload up to ${MAX_VIDEOS} video${MAX_VIDEOS === 1 ? "" : "s"}.`,
+        } satisfies ResponsePayload,
+        { status: 400 }
+      )
     }
 
     const submissionId = randomUUID()
     const uploadUrls: UploadUrl[] = []
 
-    for (const file of files) {
+    for (const { file, kind } of tagged) {
       const safeName = sanitizeFilename(file.name)
       const key = `${FOLDER_PREFIX}/${submissionId}/${safeName}`
 
@@ -118,6 +143,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         key,
         filename: safeName,
         content_type: file.type,
+        kind,
       })
     }
 
