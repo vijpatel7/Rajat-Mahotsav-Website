@@ -41,13 +41,15 @@ end $$;
 --    - image_keys and video_keys must be JSON arrays
 --    - at most 3 photos, at most 1 video
 --    - at least one media item total (photo OR video)
+--    (image_keys is cast to jsonb so this works whether the column is json or
+--    jsonb; the cast is a no-op when it is already jsonb.)
 alter table public.content_submissions
   drop constraint if exists content_submissions_media_check;
 alter table public.content_submissions
   add constraint content_submissions_media_check check (
-    jsonb_typeof(image_keys) = 'array'
-    and jsonb_typeof(video_keys) = 'array'
-    and jsonb_array_length(image_keys) <= 3
-    and jsonb_array_length(video_keys) <= 1
-    and (jsonb_array_length(image_keys) + jsonb_array_length(video_keys)) >= 1
+    jsonb_typeof(image_keys::jsonb) = 'array'
+    and jsonb_typeof(video_keys::jsonb) = 'array'
+    and jsonb_array_length(image_keys::jsonb) <= 3
+    and jsonb_array_length(video_keys::jsonb) <= 1
+    and (jsonb_array_length(image_keys::jsonb) + jsonb_array_length(video_keys::jsonb)) >= 1
   );
