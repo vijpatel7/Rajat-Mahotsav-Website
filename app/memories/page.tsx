@@ -29,6 +29,7 @@ import {
 } from "@/components/atoms/select"
 import LazyPhoneInput from "@/components/molecules/lazy-phone-input"
 import ImageUploadZone from "@/components/molecules/image-upload-zone"
+import VideoUploadZone from "@/components/molecules/video-upload-zone"
 import { Toaster } from "@/components/molecules/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { supabasePublic as supabase } from "@/utils/supabase/public-client"
@@ -36,6 +37,12 @@ import {
   MANDAL_OPTIONS_BY_COUNTRY,
   SPECIAL_COUNTRY_MANDALS,
 } from "@/lib/mandal-options"
+import {
+  MAX_IMAGES,
+  MAX_VIDEOS,
+  MAX_VIDEO_DURATION_SECONDS,
+  MIN_MEDIA_ITEMS,
+} from "@/lib/memories-upload-config"
 import "@/styles/registration-theme.css"
 import "@/styles/share-memories-theme.css"
 
@@ -44,13 +51,24 @@ type UploadUrl = {
   key: string
   filename: string
   content_type: string
+  kind: UploadUrlKind
 }
+
+type UploadUrlKind = "image" | "video"
 
 type ImageKeyEntry = {
   key: string
   filename: string
   content_type: string
   size_bytes: number
+}
+
+type VideoKeyEntry = {
+  key: string
+  filename: string
+  content_type: string
+  size_bytes: number
+  duration_seconds: number
 }
 
 const CAPTION_MIN = 10
@@ -73,8 +91,13 @@ const FormSchema = z
       .max(CAPTION_MAX, `Please keep it under ${CAPTION_MAX} characters`),
     images: z
       .array(z.any())
-      .min(1, "Please add at least one photo")
-      .max(3, "You can add up to 3 photos"),
+      .max(MAX_IMAGES, `You can add up to ${MAX_IMAGES} photos`),
+    videos: z
+      .array(z.any())
+      .max(
+        MAX_VIDEOS,
+        `You can add up to ${MAX_VIDEOS} video${MAX_VIDEOS === 1 ? "" : "s"}`
+      ),
     contactName: z.string().optional(),
     contactEmail: z
       .string()
@@ -93,6 +116,10 @@ const FormSchema = z
     contactPhoneCountryCode: z.string().optional(),
   })
   .strict()
+  .refine((data) => data.images.length + data.videos.length >= MIN_MEDIA_ITEMS, {
+    message: "Please add at least one photo or video",
+    path: ["images"],
+  })
 
 type FormData = z.infer<typeof FormSchema>
 
@@ -100,6 +127,28 @@ type MandalOption = { value: string; label: string; country: string }
 
 function toStored(display: string): string {
   return display.toLowerCase().replace(/ /g, "-")
+}
+
+/**
+ * Read a video's playback length (rounded seconds) in the browser. The upload
+ * zone already validates the limit; this captures the value to store on the
+ * record. Returns 0 if the duration can't be read for any reason.
+ */
+function readVideoDurationSeconds(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file)
+    const video = document.createElement("video")
+    video.preload = "metadata"
+    video.muted = true
+    const finish = (value: number) => {
+      URL.revokeObjectURL(url)
+      resolve(value)
+    }
+    video.onloadedmetadata = () =>
+      finish(Number.isFinite(video.duration) ? Math.round(video.duration) : 0)
+    video.onerror = () => finish(0)
+    video.src = url
+  })
 }
 
 function buildMandalOptions(): { country: string; items: MandalOption[] }[] {
@@ -159,6 +208,7 @@ export default function ShareMemoriesPage() {
       mandal: "",
       caption: "",
       images: [],
+      videos: [],
       contactName: "",
       contactEmail: "",
       contactPhone: "",
@@ -175,7 +225,11 @@ export default function ShareMemoriesPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     try {
-      const files = data.images as File[]
+      // Photos first, then video(s); the presign response preserves this order.
+      const files = [
+        ...(data.images as File[]),
+        ...((data.videos as File[]) ?? []),
+      ]
 
       // 1. Ask the server for presigned PUT URLs (server also generates the submission UUID).
       const presignRes = await fetch(
@@ -225,13 +279,30 @@ export default function ShareMemoriesPage() {
         })
       )
 
-      // 3. Insert the row into Supabase. CHECK constraint requires 1-3 keys present.
-      const imageKeys: ImageKeyEntry[] = uploadUrls.map((u, i) => ({
-        key: u.key,
-        filename: u.filename,
-        content_type: u.content_type,
-        size_bytes: files[i].size,
-      }))
+      // 3. Insert the row into Supabase. Split the returned keys back into photos
+      // and videos; the CHECK constraint requires at least one media item total.
+      const imageKeys: ImageKeyEntry[] = []
+      const videoKeys: VideoKeyEntry[] = []
+      for (let i = 0; i < uploadUrls.length; i++) {
+        const u = uploadUrls[i]
+        const file = files[i]
+        if (u.kind === "video") {
+          videoKeys.push({
+            key: u.key,
+            filename: u.filename,
+            content_type: u.content_type,
+            size_bytes: file.size,
+            duration_seconds: await readVideoDurationSeconds(file),
+          })
+        } else {
+          imageKeys.push({
+            key: u.key,
+            filename: u.filename,
+            content_type: u.content_type,
+            size_bytes: file.size,
+          })
+        }
+      }
 
       let phoneNational = data.contactPhone || ""
       if (data.contactPhone && isValidPhoneNumber(data.contactPhone)) {
@@ -250,6 +321,7 @@ export default function ShareMemoriesPage() {
         mandal: data.mandal,
         caption: data.caption.trim(),
         image_keys: imageKeys,
+        video_keys: videoKeys,
         uploader_name: data.contactName?.trim() || null,
         uploader_email: data.contactEmail?.trim() || null,
         uploader_phone_country_code: data.contactPhoneCountryCode || null,
@@ -509,7 +581,7 @@ export default function ShareMemoriesPage() {
                         <SectionHeader
                           step={2}
                           title="Add your photos"
-                          description="1 to 3 photos. Higher-quality originals look best on social media."
+                          description={`Up to ${MAX_IMAGES} photos. Higher-quality originals look best on social media.`}
                         />
 
                         <Controller
@@ -526,6 +598,34 @@ export default function ShareMemoriesPage() {
                         {errors.images && (
                           <p className="reg-error-text">
                             {errors.images.message as string}
+                          </p>
+                        )}
+                      </section>
+
+                      {/* Section: Video */}
+                      <section className="space-y-3">
+                        <SectionHeader
+                          step={3}
+                          title="Add a video (optional)"
+                          description={`Optional. ${
+                            MAX_VIDEOS === 1 ? "One short clip" : `Up to ${MAX_VIDEOS} short clips`
+                          } up to ${MAX_VIDEO_DURATION_SECONDS} seconds. A photo or a video — at least one is required.`}
+                        />
+
+                        <Controller
+                          name="videos"
+                          control={control}
+                          render={({ field }) => (
+                            <VideoUploadZone
+                              id="videos"
+                              value={field.value as File[]}
+                              onChange={(files) => field.onChange(files)}
+                            />
+                          )}
+                        />
+                        {errors.videos && (
+                          <p className="reg-error-text">
+                            {errors.videos.message as string}
                           </p>
                         )}
                       </section>

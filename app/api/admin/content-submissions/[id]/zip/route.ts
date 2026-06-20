@@ -71,6 +71,18 @@ export async function GET(
     }
   }
 
+  if ((row.video_keys?.length ?? 0) > 0) {
+    const videosFolder = zip.folder("videos")
+    for (const video of row.video_keys ?? []) {
+      try {
+        const buffer = await fetchR2Object(video.key)
+        videosFolder?.file(video.filename, buffer)
+      } catch (err) {
+        console.error("[content-submissions zip] missing video", video.key, err)
+      }
+    }
+  }
+
   const buf = await zip.generateAsync({ type: "uint8array" })
   const filename = buildArchiveFilename(row)
   return new Response(new Uint8Array(buf), {

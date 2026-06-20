@@ -90,6 +90,14 @@ export async function GET(request: Request) {
         console.error("[archive] missing image", img.key, err)
       }
     }
+    for (const video of row.video_keys ?? []) {
+      try {
+        const buffer = await fetchR2Object(video.key)
+        rowFolder?.file(video.filename, buffer)
+      } catch (err) {
+        console.error("[archive] missing video", video.key, err)
+      }
+    }
   }
 
   const buf = await zip.generateAsync({ type: "uint8array" })
@@ -136,7 +144,13 @@ const CSV_COLUMNS: (keyof ContentSubmissionRow)[] = [
 ]
 
 function buildCsv(rows: ContentSubmissionRow[]): string {
-  const headers = [...CSV_COLUMNS, "image_count", "image_keys"]
+  const headers = [
+    ...CSV_COLUMNS,
+    "image_count",
+    "image_keys",
+    "video_count",
+    "video_keys",
+  ]
   const lines: string[] = [headers.map(csvCell).join(",")]
   for (const row of rows) {
     const cells = CSV_COLUMNS.map((col) => csvCell(row[col]))
@@ -144,6 +158,12 @@ function buildCsv(rows: ContentSubmissionRow[]): string {
     cells.push(
       csvCell(
         (row.image_keys ?? []).map((img: ContentImageKey) => img.key).join("; ")
+      )
+    )
+    cells.push(csvCell(row.video_keys?.length ?? 0))
+    cells.push(
+      csvCell(
+        (row.video_keys ?? []).map((video) => video.key).join("; ")
       )
     )
     lines.push(cells.join(","))
@@ -192,6 +212,7 @@ function buildReadme(
     "  photos/<family>-<id>/ — one folder per submission",
     "    metadata.json      — full row data (caption, contact, status, notes)",
     "    <photo files>      — original-quality images submitted by the family",
+    "    <video files>      — original video clips submitted by the family (if any)",
     "",
   ].join("\n")
 }
