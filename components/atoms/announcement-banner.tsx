@@ -25,11 +25,11 @@ export function AnnouncementBanner() {
         <Link
           href="/memories"
           aria-label="Share your memories"
-          className="group inline-flex shrink-0 items-center gap-1 rounded-full border border-white/40 bg-gradient-to-b from-white to-[#f1f2f5] px-3 py-0.5 text-orange-600 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 sm:gap-1.5 sm:px-4 sm:py-1.5 sm:shadow-md"
+          className="group inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-white/40 bg-gradient-to-b from-white to-[#f1f2f5] px-3 py-0.5 text-orange-600 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 sm:gap-1.5 sm:px-4 sm:py-1.5 sm:shadow-md"
         >
           <ShimmerText
             variant="orange"
-            className="text-[0.7rem] font-extrabold uppercase tracking-wide [--shimmer-contrast:rgba(255,255,255,0.42)] sm:text-sm sm:normal-case"
+            className="block text-center text-[0.7rem] font-extrabold uppercase tracking-wide [--shimmer-contrast:rgba(255,255,255,0.42)] sm:text-sm sm:normal-case"
           >
             Share Your Memories
           </ShimmerText>
