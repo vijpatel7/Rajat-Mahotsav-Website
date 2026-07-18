@@ -39,7 +39,7 @@ const scheduleData: ScheduleDay[] = [
     dayName: "Tuesday",
     month: "July",
     events: [
-      { time: "Morning", title: "Gnan Sathe Gamat" },
+      { time: "Morning", title: "All Parayan Mahapooja" },
       { time: "Afternoon", title: "Lunch" },
       { time: "Evening", title: "Shakotsav" },
       { time: "Evening", title: "Dinner" }
