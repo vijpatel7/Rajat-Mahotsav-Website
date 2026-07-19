@@ -28,7 +28,6 @@ const scheduleData: ScheduleDay[] = [
     events: [
       { time: "Morning", title: "Welcome Program" },
       { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "All Parayan Mahapooja" },
       { time: "Evening", title: "Dinner" },
       { time: "Evening", title: "Opening Ceremony" }
     ],
