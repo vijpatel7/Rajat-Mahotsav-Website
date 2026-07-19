@@ -1,4 +1,5 @@
 export const SPIRITUAL_SEVA_STAT_KEYS = [
+  "jaap",
   "malas",
   "dhyan",
   "pradakshinas",

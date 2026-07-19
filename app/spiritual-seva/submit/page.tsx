@@ -23,6 +23,7 @@ import "@/styles/registration-theme.css"
 
 
 const sevaTypes = [
+  { id: "jaap", label: "Jaap" },
   { id: "malas", label: "Malas" },
   { id: "dhyan", label: "Dhyan (Minutes)" },
   { id: "pradakshinas", label: "Pradakshinas" },
@@ -38,7 +39,10 @@ const SubmitFormSchema = z.object({
   firstName: z.string().min(1, "First name is required").regex(/^[A-Za-z]+$/, "First name must contain only letters"),
   middleName: z.string().optional().refine((val) => !val || /^[A-Za-z]+$/.test(val), "Middle name must contain only letters"),
   lastName: z.string().min(1, "Last name is required").regex(/^[A-Za-z]+$/, "Last name must contain only letters"),
-  ghaam: z.string().min(1, "Ghaam is required").regex(/^[A-Za-z]+$/, "Ghaam must contain only letters"),
+  ghaam: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[A-Za-z]+$/.test(val), "Ghaam must contain only letters"),
   country: z.string().min(1, "Country is required"),
   mandal: z.string().min(1, "Mandal is required"),
   phoneCountryCode: z.string().min(1, "Phone country code is required"),
@@ -49,6 +53,7 @@ const SubmitFormSchema = z.object({
       message: "Invalid phone number",
     }),
   selectedSevas: z.array(z.string()).min(1, "Please select at least one seva type"),
+  jaap: z.string().optional(),
   malas: z.string().optional(),
   dhyan: z.string().optional(),
   pradakshinas: z.string().optional(),
@@ -118,6 +123,7 @@ export default function SevaSubmissionPage() {
       phoneCountryCode: "",
       phone: "",
       selectedSevas: [],
+      jaap: "",
       malas: "",
       dhyan: "",
       pradakshinas: "",
@@ -176,6 +182,7 @@ export default function SevaSubmissionPage() {
       } else {
         const formattedSubmissions = submissionsData.map(sub => ({
           date: new Date(sub.created_at).toLocaleDateString(),
+          jaap: sub.jaap,
           malas: sub.malas,
           dhyan: sub.dhyan,
           pradakshinas: sub.pradakshinas,
@@ -216,7 +223,7 @@ export default function SevaSubmissionPage() {
         first_name: data.firstName,
         middle_name: data.middleName || null,
         last_name: data.lastName,
-        ghaam: data.ghaam,
+        ghaam: data.ghaam?.trim() || null,
         country: data.country,
         mandal: data.mandal,
         phone_country_code: data.phoneCountryCode,
@@ -425,7 +432,7 @@ export default function SevaSubmissionPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="ghaam" className="reg-label">Ghaam *</Label>
+                          <Label htmlFor="ghaam" className="reg-label">Ghaam</Label>
                           <Controller
                             name="ghaam"
                             control={control}
@@ -434,7 +441,7 @@ export default function SevaSubmissionPage() {
                                 {...field}
                                 id="ghaam"
                                 type="text"
-                                placeholder="Enter your ghaam"
+                                placeholder="Enter your ghaam (optional)"
                                 className="reg-input rounded-md"
                               />
                             )}

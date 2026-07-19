@@ -11,6 +11,7 @@ describe("spiritual seva stats", () => {
     expect(
       normalizeSpiritualSevaStats({
         total_submissions: "12",
+        jaap: "1000",
         malas: "250",
         dhyan: null,
         pradakshinas: undefined,
@@ -23,6 +24,7 @@ describe("spiritual seva stats", () => {
       })
     ).toEqual({
       total_submissions: 12,
+      jaap: 1000,
       malas: 250,
       dhyan: 0,
       pradakshinas: 0,
@@ -37,13 +39,14 @@ describe("spiritual seva stats", () => {
 
   it("builds spiritual stats from raw submission rows without dropping rows", () => {
     const rows = [
-      { malas: 10, dhyan: 20, pradakshinas: 30, dandvats: 40, padyatras: 1, upvas: 2 },
+      { jaap: 100, malas: 10, dhyan: 20, pradakshinas: 30, dandvats: 40, padyatras: 1, upvas: 2 },
       { malas: 5, dhyan: null, pradakshinas: "7", sadachar: 1, harignanamrut: 1, bapashree: 1 },
-      { malas: "not-a-number", dhyan: 15, pradakshinas: -10, dandvats: 5, padyatras: 2 },
+      { jaap: "50", malas: "not-a-number", dhyan: 15, pradakshinas: -10, dandvats: 5, padyatras: 2 },
     ]
 
     expect(buildSpiritualSevaStats(rows)).toEqual({
       total_submissions: 3,
+      jaap: 150,
       malas: 15,
       dhyan: 35,
       pradakshinas: 37,
@@ -58,6 +61,7 @@ describe("spiritual seva stats", () => {
 
   it("keeps the public stat keys aligned with spiritual seva submission columns", () => {
     expect(SPIRITUAL_SEVA_STAT_KEYS).toEqual([
+      "jaap",
       "malas",
       "dhyan",
       "pradakshinas",

@@ -136,6 +136,11 @@ export default function SpiritualSevaPage() {
   const spiritualStats = [
     {
       icon: BookOpenText,
+      label: "Jaap",
+      current: statsData.jaap,
+    },
+    {
+      icon: BookOpenText,
       label: "Malas",
       current: statsData.malas,
     },
@@ -249,15 +254,25 @@ export default function SpiritualSevaPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {spiritualStats.map((stat, index) => (
-                  <ProgressCounter
-                    key={stat.label}
-                    {...stat}
-                    mode="total"
-                    delay={index * 0.1}
-                    inView={isStatsInView}
-                  />
-                ))}
+                {spiritualStats.map((stat, index) => {
+                  const isLastAloneOnLg =
+                    index === spiritualStats.length - 1 &&
+                    spiritualStats.length % 3 === 1
+
+                  return (
+                    <div
+                      key={stat.label}
+                      className={isLastAloneOnLg ? "lg:col-start-2" : undefined}
+                    >
+                      <ProgressCounter
+                        {...stat}
+                        mode="total"
+                        delay={index * 0.1}
+                        inView={isStatsInView}
+                      />
+                    </div>
+                  )
+                })}
               </div>
             </motion.div>
 

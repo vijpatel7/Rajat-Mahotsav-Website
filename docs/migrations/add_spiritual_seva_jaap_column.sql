@@ -1,6 +1,14 @@
--- Public aggregate stats for the spiritual seva landing page.
--- Returns only totals, never raw submission rows.
+-- Add jaap (mantra repetitions) to spiritual seva submissions.
+-- Apply in Supabase SQL editor before relying on jaap in the form/admin/stats.
+-- Also relaxes ghaam NOT NULL so North America mandals without a ghaam can submit.
 
+ALTER TABLE public.spiritual_seva_submission
+  ADD COLUMN IF NOT EXISTS jaap bigint DEFAULT 0;
+
+ALTER TABLE public.spiritual_seva_submission
+  ALTER COLUMN ghaam DROP NOT NULL;
+
+-- Refresh public aggregate stats to include jaap totals.
 CREATE OR REPLACE FUNCTION public.get_spiritual_seva_stats()
 RETURNS jsonb
 LANGUAGE sql
