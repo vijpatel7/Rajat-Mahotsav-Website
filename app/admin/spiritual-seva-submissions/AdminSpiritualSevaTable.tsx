@@ -44,6 +44,7 @@ type SpiritualSevaRow = {
   harignanamrut: number | null
   bapashree: number | null
   upvas: number | null
+  jaap: number | null
 }
 
 type PaginatedResponse = {
@@ -373,6 +374,12 @@ export function AdminSpiritualSevaTable({
       key: "mandal",
       header: "Mandal",
       render: (row) => mandalStoredToDisplay(row.mandal),
+    },
+    {
+      key: "jaap",
+      header: "Jaap",
+      cellClassName: "py-2.5 px-3 reg-text-primary tabular-nums text-center",
+      render: (row) => formatCount(row.jaap),
     },
     {
       key: "malas",

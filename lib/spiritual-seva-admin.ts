@@ -9,6 +9,7 @@ export const SPIRITUAL_SEVA_COLUMNS = [
   "mandal",
   "phone_country_code",
   "mobile_number",
+  "jaap",
   "malas",
   "dhyan",
   "pradakshinas",
