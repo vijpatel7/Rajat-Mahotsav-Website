@@ -29,7 +29,7 @@ const scheduleData: ScheduleDay[] = [
       { time: "Morning", title: "Welcome Program" },
       { time: "Afternoon", title: "Lunch" },
       { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Opening Ceremony" }
+      { time: "Evening", title: "All Parayan Mahapooja" }
     ],
     isHighlight: true
   },
@@ -38,7 +38,7 @@ const scheduleData: ScheduleDay[] = [
     dayName: "Tuesday",
     month: "July",
     events: [
-      { time: "Morning", title: "All Parayan Mahapooja" },
+      { time: "Morning", title: "Opening Ceremony" },
       { time: "Afternoon", title: "Lunch" },
       { time: "Evening", title: "Shakotsav" },
       { time: "Evening", title: "Dinner" }
