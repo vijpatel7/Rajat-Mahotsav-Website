@@ -357,14 +357,37 @@ export function sessionRange(session: ScheduleSession): string {
   return `${formatTime(events[0].start)} – ${formatTime(events[events.length - 1].end)}`
 }
 
+/** The mandir's own time zone, which is the one the schedule is written in. */
+export const EVENT_TIME_ZONE = "America/New_York"
+
 /**
- * Index of today within the festival, or -1 if we are outside it. Computed from
- * the local calendar date so it does not drift with time zones the way
- * Date.now() comparisons against UTC timestamps do.
+ * Today's date as the mandir would reckon it, "YYYY-MM-DD". Pinned to the event
+ * time zone rather than the visitor's: someone watching from California at 10pm
+ * on the 27th should still be shown the 27th's programme, because that is the
+ * day being celebrated in Secaucus.
  */
+function eventLocalDate(now: Date): string {
+  return now.toLocaleDateString("en-CA", { timeZone: EVENT_TIME_ZONE })
+}
+
+/** Index of today within the festival, or -1 if we are outside it. */
 export function findTodayIndex(now: Date = new Date()): number {
-  const local = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
-    now.getDate()
-  ).padStart(2, "0")}`
-  return SCHEDULE.findIndex((day) => day.date === local)
+  const today = eventLocalDate(now)
+  return SCHEDULE.findIndex((day) => day.date === today)
+}
+
+export type FestivalPosition =
+  | { phase: "before" }
+  | { phase: "during"; index: number; day: ScheduleDay }
+  | { phase: "after" }
+
+/**
+ * Where we stand relative to the festival. ISO dates compare correctly as
+ * strings, so no Date arithmetic is needed to tell before from after.
+ */
+export function festivalPosition(now: Date = new Date()): FestivalPosition {
+  const today = eventLocalDate(now)
+  const index = SCHEDULE.findIndex((day) => day.date === today)
+  if (index >= 0) return { phase: "during", index, day: SCHEDULE[index] }
+  return today < SCHEDULE[0].date ? { phase: "before" } : { phase: "after" }
 }
