@@ -268,7 +268,7 @@ export default function TitleSectionMobile({ targetDate = "2026-07-27T07:30:00-0
                     className="flex flex-row justify-center gap-5"
                   >
                     <Link
-                      href="/registration"
+                      href="/schedule"
                       className="group relative isolate inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-sans font-bold text-sm overflow-hidden transition-all border duration-300 hover:-translate-y-0.5 hover:scale-[1.03] active:scale-[0.99] shadow-[0_10px_26px_rgba(212,140,18,0.28)]"
                       style={{
                         borderColor: "rgba(226, 170, 70, 0.7)",
@@ -277,7 +277,7 @@ export default function TitleSectionMobile({ targetDate = "2026-07-27T07:30:00-0
                       }}
                     >
                       <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.22),transparent_55%)] opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
-                      <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(85,45,0,0.45)]">Register Now</span>
+                      <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(85,45,0,0.45)]">View Schedule</span>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 relative z-10">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                       </svg>

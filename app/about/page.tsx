@@ -100,10 +100,10 @@ export default function AboutPage() {
               </p>
               <div className="mt-5">
                 <a
-                  href="/registration"
+                  href="/schedule"
                   className="inline-flex items-center rounded-full border border-purple-300 bg-purple-100 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-200 transition-colors"
                 >
-                  Register for the Event
+                  View Schedule
                 </a>
               </div>
             </div>

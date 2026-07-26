@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Home, ScrollText, ClipboardPen, CalendarDays } from "lucide-react"
+import { Home, ScrollText, CalendarDays } from "lucide-react"
 import { MenuBar } from "@/components/organisms/glow-menu"
 import { useDeviceType } from "@/hooks/use-device-type"
 import Image from "next/image"
@@ -17,28 +17,20 @@ const menuItems = [
     iconColor: "text-blue-500",
   },
   {
-    icon: ScrollText,
-    label: "Timeline",
-    href: "/timeline",
-    gradient:
-      "radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.06) 50%, rgba(194,65,12,0) 100%)",
-    iconColor: "text-orange-500",
-  },
-  {
-    icon: ClipboardPen,
-    label: "Registration",
-    href: "/registration",
-    gradient:
-      "radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(22,163,74,0.06) 50%, rgba(21,128,61,0) 100%)",
-    iconColor: "text-green-500",
-  },
-  {
     icon: CalendarDays,
     label: "Schedule",
     href: "/schedule",
     gradient:
       "radial-gradient(circle, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.06) 50%, rgba(185,28,28,0) 100%)",
     iconColor: "text-red-500",
+  },
+  {
+    icon: ScrollText,
+    label: "Timeline",
+    href: "/timeline",
+    gradient:
+      "radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.06) 50%, rgba(194,65,12,0) 100%)",
+    iconColor: "text-orange-500",
   },
 ]
 

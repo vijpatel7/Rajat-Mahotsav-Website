@@ -3,23 +3,21 @@
 import { useState, useEffect, useRef } from "react"
 import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image, CalendarCheck, FileText, BookA, MapPinned, Camera } from "lucide-react"
+import { Home, ScrollText, CalendarDays, Hotel, Heart, FileText, BookA, MapPinned, Camera } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { useRouter, usePathname } from "next/navigation"
 import { FloatingButton } from "../atoms/floating-button"
 
 const menuItems = [
   { icon: Home, label: "Home", href: "/" },
-  { icon: ScrollText, label: "Timeline", href: "/timeline" },
+  { icon: CalendarDays, label: "Schedule", href: "/schedule" },
   {
     icon: MapPinned,
     label: "Attend",
     href: "#",
     subItems: [
       { icon: BookA, label: "About the Mahotsav", href: "/about" },
-      { icon: ClipboardPen, label: "Registration", href: "/registration" },
       { icon: FileText, label: "Invitation", href: "/invitation" },
-      { icon: CalendarDays, label: "Schedule", href: "/schedule" },
       { icon: Hotel, label: "Guest Services", href: "/guest-services" },
     ]
   },
@@ -33,8 +31,7 @@ const menuItems = [
     ]
   },
   { icon: Camera, label: "Share Memories", href: "/memories" },
-  { icon: CalendarCheck, label: "Latest Events", href: "/latest-events" },
-  { icon: Image, label: "Media", href: "/media" },
+  { icon: ScrollText, label: "Timeline", href: "/timeline" },
 ]
 
 export function FloatingMenuButton() {
