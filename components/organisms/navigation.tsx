@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { Home, ScrollText, CalendarDays, Hotel, Heart, Shield, FileText, BookA, MapPinned, Camera } from "lucide-react"
+import { Home, ScrollText, CalendarDays, Heart, Shield, BookA, MapPinned, Camera, Car } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { NavBar } from "@/components/organisms/tubelight-navbar"
 import { CDN_ASSETS } from "@/lib/cdn-assets"
@@ -58,14 +58,9 @@ const menuItems: NavigationItem[] = [
         href: "/about",
       },
       {
-        icon: FileText,
-        label: "Invitation",
-        href: "/invitation",
-      },
-      {
-        icon: Hotel,
-        label: "Guest Services",
-        href: "/guest-services",
+        icon: Car,
+        label: "Parking & Transportation",
+        href: "/parking",
       },
     ],
   },

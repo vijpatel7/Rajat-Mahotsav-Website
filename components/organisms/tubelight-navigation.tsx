@@ -1,13 +1,11 @@
 "use client"
 
-import { Home, ScrollText, CalendarDays, Hotel, Heart, FileText } from "lucide-react"
+import { Home, ScrollText, CalendarDays, Heart } from "lucide-react"
 import { NavBar } from "@/components/organisms/tubelight-navbar"
 
 const navItems = [
   { name: "Home", url: "/", icon: Home },
   { name: "Schedule", url: "/schedule", icon: CalendarDays },
-  { name: "Invitation", url: "/invitation", icon: FileText },
-  { name: "Guest Services", url: "/guest-services", icon: Hotel },
   { name: "Community Seva", url: "/community-seva", icon: Heart },
   { name: "Timeline", url: "/timeline", icon: ScrollText },
 ]

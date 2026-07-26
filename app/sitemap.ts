@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/spiritual-seva',
     '/spiritual-seva/submit',
     '/guest-services',
+    '/parking',
     '/media',
   ]
 
