@@ -115,6 +115,7 @@ export default function ParkingPage() {
       <div className="container mx-auto px-4 relative z-10">
         <StandardPageHeader
           title="Parking & Transportation"
+          subtitle="July 27 - August 2, 2026"
           description="Everything you need to know about arriving at the Mahotsav — where to drop off your family, where to park, and how hotel shuttles and the parking-garage bus run to the temple."
           isLoaded={isLoaded}
         />

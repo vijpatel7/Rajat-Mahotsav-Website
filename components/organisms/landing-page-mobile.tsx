@@ -285,7 +285,7 @@ export default function TitleSectionMobile({ targetDate = "2026-07-27T07:30:00-0
                     </Link>
 
                     <Link
-                      href="/about"
+                      href="/parking"
                       className="group relative isolate inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-sans font-bold text-sm overflow-hidden transition-all border duration-300 hover:-translate-y-0.5 hover:scale-[1.03] active:scale-[0.99]"
                       style={{
                         borderColor: "rgba(255, 200, 90, 0.5)",
@@ -295,7 +295,7 @@ export default function TitleSectionMobile({ targetDate = "2026-07-27T07:30:00-0
                       }}
                     >
                       <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,230,170,0.28),transparent_60%)] opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
-                      <span className="relative z-10">About the Mahotsav</span>
+                      <span className="relative z-10">Transportation Information</span>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 relative z-10">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                       </svg>
