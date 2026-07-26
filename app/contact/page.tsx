@@ -121,6 +121,14 @@ export default function ContactPage() {
               </a>
 
               <a
+                href="/parking"
+                className="block p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg hover:shadow-md transition-all"
+              >
+                <h3 className="font-semibold text-orange-600 mb-1">Parking & Transportation</h3>
+                <p className="text-sm text-gray-600">Where to park and shuttle schedules</p>
+              </a>
+
+              <a
                 href="/latest-events"
                 className="block p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg hover:shadow-md transition-all"
               >

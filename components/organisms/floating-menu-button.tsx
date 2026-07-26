@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, ScrollText, CalendarDays, Hotel, Heart, FileText, BookA, MapPinned, Camera } from "lucide-react"
+import { Home, ScrollText, CalendarDays, Heart, BookA, MapPinned, Camera, Car } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { useRouter, usePathname } from "next/navigation"
 import { FloatingButton } from "../atoms/floating-button"
@@ -17,8 +17,7 @@ const menuItems = [
     href: "#",
     subItems: [
       { icon: BookA, label: "About the Mahotsav", href: "/about" },
-      { icon: FileText, label: "Invitation", href: "/invitation" },
-      { icon: Hotel, label: "Guest Services", href: "/guest-services" },
+      { icon: Car, label: "Parking", href: "/parking" },
     ]
   },
   {

@@ -29,6 +29,16 @@ const nextConfig = {
         destination: '/memories',
         permanent: true,
       },
+      {
+        source: '/parking-transportation',
+        destination: '/parking',
+        permanent: true,
+      },
+      {
+        source: '/transportation',
+        destination: '/parking',
+        permanent: true,
+      },
     ]
   },
   async headers() {
