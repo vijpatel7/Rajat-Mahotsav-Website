@@ -2,7 +2,11 @@
 
 - Prefers to preview changes on a local dev server (`npm run dev`, http://localhost:3000) before approving; often explicitly asks to start the server.
 - For redesign work, wants several design options shown first as a local mockup (often via the `/frontend-design` skill) before any implementation.
+- Rejects generic AI design tells (buzzing dots, thin accent-line rectangles, tiny eyebrow labels before titles); designs must match existing site fonts, colors, and patterns.
+- For new information pages, closely reuse existing info-page styling rather than inventing a divergent look.
 - Frequently asks the agent to commit and push directly to the remote (including `main`) once changes look good.
+- Prefers isolated feature work in git worktrees created from remote `main`.
+- For DB migrations and bulk data uploads, prepare artifacts for review and wait for explicit approval before running or submitting.
 - Wants Supabase/DB calls for live counters kept strictly read-only, secure, and unbounded (no row limits); asks to validate this before shipping.
 - When renaming user-facing labels, keep internal DB field names stable (e.g. label "Family Name" → "Name" while the `family_name` field is unchanged).
 - Uses the `cursor/` branch prefix for new work branches.
@@ -15,4 +19,8 @@
 - R2 `FOLDER_PREFIX = "share-memories"` in `app/api/generate-content-submission-upload-urls/route.ts` must stay unchanged even though the route moved; renaming it orphans existing uploads.
 - Upload file type/size validation is client-metadata only at presign time (no magic-byte check) — a known gap noted in `SECURITY.md`.
 - Live counters on the community-seva and spiritual-seva pages tally Supabase submission data using shared components.
+- Spiritual seva submissions include a `jaap` (mantra repetitions) column reflected in form, admin, and aggregate stats.
+- Detailed public event schedule lives in `lib/schedule-data.ts` (session-grouped); keep internal logistics unpublished; timeline content stays in `lib/timeline-data.ts`.
+- Schedule UI copy uses American "Schedule" (not "programmes"); homepage/current-event surfaces should show general day/session realm, not live minute-to-minute program titles.
+- Primary nav order starts Home then Schedule; CTAs favor Schedule over Registration (registration closed); Latest Events and Media routes remain but are hidden from toolbars.
 - Dev server runs on `localhost:3000` via `npm run dev` and reads config from `.env.local`.

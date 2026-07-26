@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { Home, ScrollText, ClipboardPen, CalendarDays, Hotel, Heart, Image as ImageIcon, CalendarCheck, Shield, FileText, BookA, MapPinned, Camera } from "lucide-react"
+import { Home, ScrollText, CalendarDays, Hotel, Heart, Shield, FileText, BookA, MapPinned, Camera } from "lucide-react"
 import { PiHandsPraying } from "react-icons/pi"
 import { NavBar } from "@/components/organisms/tubelight-navbar"
 import { CDN_ASSETS } from "@/lib/cdn-assets"
@@ -37,12 +37,12 @@ const menuItems: NavigationItem[] = [
     iconColor: "text-blue-500",
   },
   {
-    icon: ScrollText,
-    label: "Timeline",
-    href: "/timeline",
+    icon: CalendarDays,
+    label: "Schedule",
+    href: "/schedule",
     gradient:
-      "radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.06) 50%, rgba(194,65,12,0) 100%)",
-    iconColor: "text-orange-500",
+      "radial-gradient(circle, rgba(239,68,68,0.15) 0%, rgba(220,38,38,0.06) 50%, rgba(185,28,28,0) 100%)",
+    iconColor: "text-red-500",
   },
   {
     icon: MapPinned,
@@ -58,19 +58,9 @@ const menuItems: NavigationItem[] = [
         href: "/about",
       },
       {
-        icon: ClipboardPen,
-        label: "Registration",
-        href: "/registration",
-      },
-      {
         icon: FileText,
         label: "Invitation",
         href: "/invitation",
-      },
-      {
-        icon: CalendarDays,
-        label: "Schedule",
-        href: "/schedule",
       },
       {
         icon: Hotel,
@@ -108,20 +98,12 @@ const menuItems: NavigationItem[] = [
     iconColor: "text-rose-500",
   },
   {
-    icon: CalendarCheck,
-    label: "Latest Events",
-    href: "/latest-events",
+    icon: ScrollText,
+    label: "Timeline",
+    href: "/timeline",
     gradient:
       "radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.06) 50%, rgba(194,65,12,0) 100%)",
     iconColor: "text-orange-500",
-  },
-  {
-    icon: ImageIcon,
-    label: "Media",
-    href: "/media",
-    gradient:
-      "radial-gradient(circle, rgba(236,72,153,0.15) 0%, rgba(219,39,119,0.06) 50%, rgba(190,24,93,0) 100%)",
-    iconColor: "text-pink-500",
   },
 ]
 
