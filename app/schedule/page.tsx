@@ -4,124 +4,31 @@ import { useState, useEffect } from "react"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { motion, AnimatePresence } from "framer-motion"
 import { Clock, MapPin, ChevronRight } from "lucide-react"
-
-interface Event {
-  time: string
-  title: string
-  description?: string
-  location?: string
-}
-
-interface ScheduleDay {
-  date: string
-  dayName: string
-  month: string
-  events: Event[]
-  isHighlight?: boolean
-}
-
-const scheduleData: ScheduleDay[] = [
-  {
-    date: "27",
-    dayName: "Monday",
-    month: "July",
-    events: [
-      { time: "Morning", title: "Welcome Program" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "All Parayan Mahapooja" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "28",
-    dayName: "Tuesday",
-    month: "July",
-    events: [
-      { time: "Morning", title: "Opening Ceremony" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Evening", title: "Shakotsav" },
-      { time: "Evening", title: "Dinner" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "29",
-    dayName: "Wednesday",
-    month: "July",
-    events: [
-      { time: "Morning", title: "Gurupoonam" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Bhakti Sandhya" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "30",
-    dayName: "Thursday",
-    month: "July",
-    events: [
-      { time: "Morning", title: "Morning Program" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "Ladies Program" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Samuh Raas" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "31",
-    dayName: "Friday",
-    month: "July",
-    events: [
-      { time: "Morning", title: "Morning Program" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "Hindola Program" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Bhakti Nrutya" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "1",
-    dayName: "Saturday",
-    month: "August",
-    events: [
-      { time: "Morning", title: "Nagaryatra" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "Abhishek Program" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Sanskrutik Drama" }
-    ],
-    isHighlight: true
-  },
-  {
-    date: "2",
-    dayName: "Sunday",
-    month: "August",
-    events: [
-      { time: "Morning", title: "Patotsav Celebrations" },
-      { time: "Afternoon", title: "Lunch" }
-    ],
-    isHighlight: true
-  }
-]
+import {
+  getEventCountExcludingMeals,
+  getEasternDateIso,
+  scheduleData,
+  splitTimeRange,
+} from "@/lib/schedule-data"
 
 export default function SchedulePage() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number>(0)
   const [isMobile, setIsMobile] = useState(false)
-
-  const getEventCountExcludingMeals = (events: Event[]) =>
-    events.filter((event) => {
-      const normalizedTitle = event.title.trim().toLowerCase()
-      return normalizedTitle !== "lunch" && normalizedTitle !== "dinner"
-    }).length
+  const [todayIso, setTodayIso] = useState<string | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 300)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const iso = getEasternDateIso()
+    setTodayIso(iso)
+    const todayIndex = scheduleData.findIndex((day) => day.isoDate === iso)
+    if (todayIndex >= 0) {
+      setSelectedDay(todayIndex)
+    }
   }, [])
 
   useEffect(() => {
@@ -189,8 +96,10 @@ export default function SchedulePage() {
                   }`} />
 
                   {/* Month Label */}
-                  <div className={`absolute top-3 left-3 font-bold tracking-wider uppercase ${
-                    selectedDay === index ? 'text-lg text-orange-700' : 'text-base text-gray-400 group-hover:text-orange-400'
+                  <div className={`absolute top-2.5 left-2.5 lg:top-3 lg:left-3 font-bold tracking-wider uppercase ${
+                    selectedDay === index
+                      ? 'text-xs lg:text-base xl:text-lg text-orange-700'
+                      : 'text-xs lg:text-sm xl:text-base text-gray-400 group-hover:text-orange-400'
                   }`}>
                     {day.month}
                   </div>
@@ -205,17 +114,26 @@ export default function SchedulePage() {
                   </div>
 
                   {/* Date & Day */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pt-6">
-                    <div className={`font-black tracking-tighter mb-1 leading-none ${
-                      selectedDay === index ? 'text-7xl text-orange-600' : 'text-5xl text-gray-800 group-hover:text-orange-600'
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pt-5 lg:pt-6 px-1.5">
+                    <div className={`font-black tracking-tighter leading-none ${
+                      selectedDay === index
+                        ? 'text-3xl lg:text-5xl xl:text-6xl text-orange-600'
+                        : 'text-3xl lg:text-4xl xl:text-5xl text-gray-800 group-hover:text-orange-600'
                     }`}>
                       {day.date}
                     </div>
-                    <div className={`font-bold tracking-wide mt-1 ${
-                      selectedDay === index ? 'text-lg text-orange-700' : 'text-sm text-gray-500 group-hover:text-orange-500'
+                    <div className={`font-bold tracking-wide mt-1 lg:mt-1.5 ${
+                      selectedDay === index
+                        ? 'text-xs lg:text-base xl:text-lg text-orange-700'
+                        : 'text-xs lg:text-sm text-gray-500 group-hover:text-orange-500'
                     }`}>
                       {day.dayName.slice(0, 3).toUpperCase()}
                     </div>
+                    {todayIso === day.isoDate && (
+                      <div className="mt-1 lg:mt-1.5 px-1.5 lg:px-2 py-0.5 rounded-full text-[0.55rem] lg:text-[0.6rem] font-extrabold uppercase tracking-wider bg-orange-500 text-white shadow-sm">
+                        Today
+                      </div>
+                    )}
                   </div>
 
                   {/* Selection Indicator */}
@@ -276,11 +194,11 @@ export default function SchedulePage() {
                           theme.gradients.eventHighlightStatic
                         } hover:${theme.gradients.eventHighlight}`}
                       >
-                        {/* Time Badge */}
-                        <div className="flex-shrink-0 w-32">
-                          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl bg-white shadow-sm border ${theme.colors.border}`}>
-                            <Clock className={`w-4 h-4 ${theme.colors.highlight}`} />
-                            <span className={`text-sm font-bold tracking-wide ${theme.colors.highlight}`}>{event.time}</span>
+                        {/* Time Badge — sized to content so ranges stay on one line */}
+                        <div className="flex-shrink-0">
+                          <div className={`inline-flex items-center gap-2 min-w-[8.5rem] px-3 sm:px-4 py-2 rounded-xl bg-white shadow-sm border ${theme.colors.border}`}>
+                            <Clock className={`w-4 h-4 flex-shrink-0 ${theme.colors.highlight}`} />
+                            <span className={`text-xs sm:text-sm font-bold tracking-wide whitespace-nowrap ${theme.colors.highlight}`}>{event.time}</span>
                           </div>
                         </div>
 
@@ -293,6 +211,16 @@ export default function SchedulePage() {
                             <p className="text-sm text-gray-600 leading-relaxed">
                               {event.description}
                             </p>
+                          )}
+                          {event.items && (
+                            <ul className="mt-3 grid gap-x-10 gap-y-2 sm:grid-cols-[repeat(2,minmax(0,max-content))] border-l-2 border-orange-200 pl-4">
+                              {event.items.map((item) => (
+                                <li key={item} className="flex items-start gap-2 text-[0.95rem] text-gray-700">
+                                  <span className="mt-[0.55rem] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-400" />
+                                  <span className="font-medium leading-snug">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
                           )}
                           {event.location && (
                             <div className="flex items-center gap-1.5 mt-2 text-sm text-orange-600">
@@ -396,28 +324,48 @@ export default function SchedulePage() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: eventIndex * 0.05 }}
-                            className="flex items-start gap-3 p-4 rounded-xl bg-white shadow-sm border border-orange-100/50"
+                            className="p-4 rounded-xl bg-white shadow-sm border border-orange-100/50"
                           >
-                            {/* Time */}
-                            <div className={`flex-shrink-0 px-3 py-1.5 rounded-lg bg-white shadow-sm border ${theme.colors.border}`}>
-                              <div className={`text-xs font-bold whitespace-nowrap ${theme.colors.highlight}`}>{event.time}</div>
-                            </div>
+                            {/* Time + title share one centered line */}
+                            <div className="flex items-center gap-3">
+                              <div className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg bg-white shadow-sm border ${theme.colors.border}`}>
+                                {splitTimeRange(event.time).map((line) => (
+                                  <div
+                                    key={line}
+                                    className={`text-xs font-bold leading-tight whitespace-nowrap ${theme.colors.highlight}`}
+                                  >
+                                    {line}
+                                  </div>
+                                ))}
+                              </div>
 
-                            {/* Event Details */}
-                            <div className="flex-grow min-w-0">
-                              <h4 className="text-base font-bold text-gray-800 leading-tight">
+                              <h4 className="flex-grow min-w-0 text-base font-bold text-gray-800 leading-tight">
                                 {event.title}
                               </h4>
-                              {event.description && (
-                                <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                              )}
-                              {event.location && (
-                                <div className="flex items-center gap-1 mt-1.5 text-xs text-orange-600">
-                                  <MapPin className="w-3 h-3" />
-                                  <span className="font-medium">{event.location}</span>
-                                </div>
-                              )}
                             </div>
+
+                            {event.description && (
+                              <p className="text-sm text-gray-600 mt-2">{event.description}</p>
+                            )}
+
+                            {/* Sub-items sit below the time + title line */}
+                            {event.items && (
+                              <ul className="mt-3 space-y-1.5 border-l-2 border-orange-200 pl-3">
+                                {event.items.map((item) => (
+                                  <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
+                                    <span className="mt-[0.45rem] h-1 w-1 flex-shrink-0 rounded-full bg-orange-400" />
+                                    <span className="font-medium leading-snug">{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+
+                            {event.location && (
+                              <div className="flex items-center gap-1 mt-2 text-xs text-orange-600">
+                                <MapPin className="w-3 h-3" />
+                                <span className="font-medium">{event.location}</span>
+                              </div>
+                            )}
                           </motion.div>
                         ))}
                       </div>
