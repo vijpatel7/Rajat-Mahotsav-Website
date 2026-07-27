@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hero · Today Highlights (Option A refined)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --slate-950: #020617;
+    --slate-900: #0f172a;
+    --gold-1: #FFD700;
+    --gold-2: #FFA500;
+    --gold-3: #FF8C00;
+    --gold-4: #D4AF37;
+    --gold-soft: #FFB832;
+    --gold-pale: #FFD88A;
+    --font-display: "Instrument Serif", Georgia, serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box }
+  body {
+    margin: 0; font-family: var(--font-body); color: #f8fafc;
+    background: #0a0e1a; -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, p { margin: 0 }
+  .harness {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 14, 26, 0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 180, 50, 0.12);
+  }
+  .harness-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 22px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .harness-title {
+    font-family: var(--font-display); font-size: 1.55rem; line-height: 1;
+  }
+  .harness-title small {
+    font-family: var(--font-body); font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .18em; color: var(--gold-soft); margin-left: 10px;
+  }
+  .harness-sub { margin-left: auto; font-size: .78rem; color: #94a3b8; max-width: 520px; line-height: 1.45 }
+  .harness-sub b { color: var(--gold-pale) }
+  .stage { max-width: 1180px; margin: 36px auto 18px; padding: 0 24px }
+  .stage-frame {
+    position: relative; border-radius: 18px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,160,40,0.08), transparent 55%),
+      linear-gradient(180deg, #1a2744 0%, var(--slate-900) 55%, var(--slate-950) 100%);
+    min-height: 420px; display: flex; align-items: flex-end; padding: 28px 20px 24px;
+  }
+  .brand-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    padding: 8px 18px; border-radius: 999px;
+    border: 1px solid rgba(255,180,50,0.4);
+    background: rgba(255,180,50,0.12); color: var(--gold-soft);
+    margin-bottom: 12px;
+  }
+  .brand-title {
+    font-family: var(--font-display); font-weight: 700; line-height: 1.1;
+    font-size: clamp(1.55rem, 3.2vw, 2.75rem); white-space: nowrap;
+    background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 30%, var(--gold-3) 60%, var(--gold-4) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand-sub {
+    font-family: var(--font-display); font-size: clamp(1.05rem, 2vw, 1.65rem);
+    color: rgba(255,255,255,0.95); margin-top: 4px;
+  }
+  .brand-loc {
+    font-family: var(--font-display); font-size: clamp(0.95rem, 1.6vw, 1.35rem);
+    color: rgba(255,255,255,0.88); margin-top: 2px;
+  }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px }
+  .cta-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: .9rem;
+    text-decoration: none; color: #fff;
+    border: 1px solid rgba(226,170,70,0.7);
+    background: linear-gradient(135deg, rgba(220,160,70,0.95), rgba(191,115,20,0.92));
+  }
+  .cta-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: .9rem;
+    text-decoration: none; color: var(--gold-pale);
+    border: 1px solid rgba(255,200,90,0.45);
+    background: rgba(255,195,80,0.16);
+  }
+  .card-a {
+    position: relative; z-index: 2; width: 100%;
+    border-radius: 22px; overflow: hidden;
+    background: linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 50%, rgba(255,200,100,0.04) 100%);
+    backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255, 200, 100, 0.14);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .card-a::after {
+    content: "";
+    position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,200,100,0.55), transparent);
+  }
+  .day-tag {
+    position: absolute; top: 14px; right: 14px; z-index: 5;
+    display: inline-flex; align-items: center;
+    font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold-soft);
+    background: rgba(255,180,50,0.12);
+    border: 1px solid rgba(255,180,50,0.35);
+    padding: 5px 11px; border-radius: 999px;
+  }
+  .card-a-inner {
+    display: grid; grid-template-columns: 1.15fr 1fr;
+    gap: 0; align-items: stretch;
+  }
+  .card-a-left { padding: 22px 28px 24px }
+  .card-a-right {
+    padding: 18px 24px 22px; padding-right: 5.5rem;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(255,180,50,0.05), transparent 60%);
+  }
+  .day-title {
+    font-family: var(--font-display); font-size: 1.55rem; color: #fff;
+    line-height: 1.15; margin-bottom: 12px;
+  }
+  .sessions { display: flex; flex-direction: column; gap: 8px }
+  .session {
+    display: grid; grid-template-columns: 78px 1fr; gap: 10px;
+    align-items: start; padding: 8px 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .session-label {
+    font-size: .65rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold-4); padding-top: 3px;
+  }
+  .session-body { font-size: .92rem; font-weight: 600; color: rgba(255,255,255,0.94); line-height: 1.35 }
+  .foot {
+    max-width: 1180px; margin: 24px auto 70px; padding: 0 24px;
+    font-size: .82rem; color: #64748b; line-height: 1.55;
+  }
+  @media (max-width: 860px) {
+    .card-a-inner { grid-template-columns: 1fr }
+    .card-a-right { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); padding-right: 24px; padding-top: 28px }
+    .brand-title { white-space: normal }
+  }
+</style>
+</head>
+<body>
+<div class="harness">
+  <div class="harness-inner">
+    <div class="harness-title">Hero Today Card <small>Option A · refined</small></div>
+    <div class="harness-sub">
+      No pulsing “Today” chip. <b>Day 1 of 7</b> is a top-right card tag.
+      Heading is <b>Monday, July 27th Highlights</b>. Aashirwad sits inline after Shobha Yatra.
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-frame">
+    <div class="card-a">
+      <span class="day-tag">Day 1 of 7</span>
+      <div class="card-a-inner">
+        <div class="card-a-left">
+          <span class="brand-badge">✦ Celebrating 25 Years ✦</span>
+          <h1 class="brand-title">Shree Ghanshyam Maharaj</h1>
+          <p class="brand-sub">Rajat Pratishtha Mahotsav</p>
+          <p class="brand-loc">Shree Swaminarayan Temple</p>
+          <p class="brand-loc">Secaucus, New Jersey</p>
+        </div>
+        <div class="card-a-right">
+          <h2 class="day-title">Monday, July 27th Highlights</h2>
+          <div class="sessions">
+            <div class="session">
+              <div class="session-label">Morning</div>
+              <div class="session-body">Shobha Yatra, Aashirwad &amp; Welcome Program</div>
+            </div>
+            <div class="session">
+              <div class="session-label">Midday</div>
+              <div class="session-body">Lunch</div>
+            </div>
+            <div class="session">
+              <div class="session-label">Evening</div>
+              <div class="session-body">All Parayan Mahapooja</div>
+            </div>
+          </div>
+          <div class="cta-row">
+            <a class="cta-primary" href="/schedule">Full Day Schedule →</a>
+            <a class="cta-secondary" href="/parking">Transportation</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  This refinement is now implemented on the live homepage (desktop + mobile) and Monday’s full flyer times are on <code>/schedule</code>.
+</div>
+</body>
+</html>

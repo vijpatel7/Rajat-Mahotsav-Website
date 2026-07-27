@@ -2,15 +2,11 @@
 
 import { motion } from "framer-motion"
 import { useLoading } from "@/hooks/use-loading"
-import CountdownTimer from "@/components/molecules/countdown-timer"
+import TodayHighlights, { DayOfEventTag } from "@/components/molecules/today-highlights"
 import Link from "next/link"
 import { Skiper53 } from "@/components/ui/skiper-ui/skiper53"
 
-interface TitleSectionProps {
-  targetDate?: string
-}
-
-export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" }: TitleSectionProps) {
+export default function TitleSection() {
   const { isLoading } = useLoading()
 
   return (
@@ -74,17 +70,32 @@ export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" 
               <div
                 className="relative rounded-2xl sm:rounded-3xl overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.03) 100%)",
-                  backdropFilter: "blur(12px) saturate(130%)",
-                  WebkitBackdropFilter: "blur(12px) saturate(130%)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
+                  background: "linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 200, 100, 0.04) 100%)",
+                  backdropFilter: "blur(16px) saturate(140%)",
+                  WebkitBackdropFilter: "blur(16px) saturate(140%)",
+                  border: "1px solid rgba(255, 200, 100, 0.14)",
                   boxShadow: `
-                    0 4px 20px rgba(0, 0, 0, 0.15),
-                    0 0 0 1px rgba(255, 255, 255, 0.02),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.04)
+                    0 8px 32px rgba(0, 0, 0, 0.28),
+                    0 0 0 1px rgba(255, 180, 50, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08)
                   `
                 }}
               >
+                {/* Top gold hairline */}
+                <div
+                  className="pointer-events-none absolute top-0 left-[8%] right-[8%] h-px z-20"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,200,100,0.55), transparent)" }}
+                />
+
+                {/* Day-of tag — top right corner of card */}
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={!isLoading ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                  transition={{ duration: 0.6, delay: !isLoading ? 0.9 : 0 }}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 pointer-events-none"
+                >
+                  <DayOfEventTag />
+                </motion.div>
 
                 {/* Card content - Horizontal layout */}
                 <div className="relative px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-6">
@@ -121,7 +132,7 @@ export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" 
                         className="text-center lg:text-left mb-2"
                       >
                         <h1
-                          className="font-instrument-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight whitespace-nowrap"
+                          className="font-instrument-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight lg:whitespace-nowrap"
                           style={{
                             background: "linear-gradient(135deg, #FFD700 0%, #FFA500 30%, #FF8C00 60%, #D4AF37 100%)",
                             WebkitBackgroundClip: "text",
@@ -176,16 +187,15 @@ export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" 
                     {/* Vertical divider for desktop */}
                     <div className="hidden lg:block w-px bg-white/10 self-stretch my-2" />
 
-                    {/* RIGHT COLUMN - Countdown & Buttons */}
-                    <div className="flex-shrink-0 lg:pl-6 mt-4 lg:mt-0">
-                      {/* Countdown timer */}
+                    {/* RIGHT COLUMN - Today's highlights & Buttons */}
+                    <div className="flex-shrink-0 lg:pl-6 mt-4 lg:mt-0 lg:min-w-[20rem] xl:min-w-[22rem] lg:pt-1 lg:pr-20">
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={!isLoading ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                         transition={{ duration: 0.8, delay: !isLoading ? 1.4 : 0, ease: "easeOut" }}
-                        className="flex justify-center lg:justify-start mb-4"
+                        className="mb-4"
                       >
-                        <CountdownTimer targetDate={targetDate} />
+                        <TodayHighlights />
                       </motion.div>
 
                       {/* CTA Buttons - stacked on right column */}
@@ -205,7 +215,7 @@ export default function TitleSection({ targetDate = "2026-07-27T07:30:00-04:00" 
                           }}
                         >
                           <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.22),transparent_55%)] opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
-                          <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(85,45,0,0.45)]">View Schedule</span>
+                          <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(85,45,0,0.45)]">Full Day Schedule</span>
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:translate-x-1 transition-transform">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                           </svg>

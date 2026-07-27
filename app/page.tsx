@@ -32,7 +32,6 @@ const gurus = [
 ]
 
 export default function ShaderShowcase() {
-  const targetDate = '2026-07-27T07:30:00-04:00';
   const deviceType = useDeviceType();
 
   const [isLoaded, setIsLoaded] = useState(false)
@@ -101,10 +100,10 @@ export default function ShaderShowcase() {
       {/* Title section - Scrollable overlay */}
       <div className="relative z-10 bg-slate-900 min-h-screen block">
         <div className="hidden md:block">
-          <TitleSection targetDate={targetDate} />
+          <TitleSection />
         </div>
         <div className="md:hidden min-h-screen">
-          <TitleSectionMobile targetDate={targetDate} />
+          <TitleSectionMobile />
         </div>
       </div>
 
