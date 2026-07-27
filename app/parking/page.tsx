@@ -116,7 +116,7 @@ export default function ParkingPage() {
         <StandardPageHeader
           title="Parking & Transportation"
           subtitle="July 27 - August 2, 2026"
-          description="Everything you need to know about arriving at the Mahotsav — where to drop off your family, where to park, and how hotel shuttles and the parking-garage bus run to the temple."
+          description="Everything you need to know about arriving at the Mahotsav — where to drop off your family, where to park, and how hotel shuttles and the parking-deck bus run to the temple."
           isLoaded={isLoaded}
         />
       </div>
@@ -170,7 +170,7 @@ export default function ParkingPage() {
             </div>
           </motion.section>
 
-          {/* Main Parking Location */}
+          {/* Parking Deck */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -180,7 +180,7 @@ export default function ParkingPage() {
           >
             <div className="flex items-center gap-3 mb-8">
               <ParkingCircle className="h-8 w-8 text-orange-500" />
-              <h2 className="text-3xl font-bold">Main Parking Location</h2>
+              <h2 className="text-3xl font-bold">Parking Deck</h2>
             </div>
             <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-orange-200">
               <h3 className="acc-card-title mb-4">{mainParkingRule.title}</h3>
@@ -238,6 +238,22 @@ export default function ParkingPage() {
                   <p className="acc-card-base text-gray-700 leading-relaxed">
                     {rule.summary}
                   </p>
+                  {rule.details.length > 0 ? (
+                    <ul className="mt-4 space-y-2">
+                      {rule.details.map((detail) => (
+                        <li
+                          key={detail}
+                          className="flex items-start gap-2 acc-card-base text-gray-700 leading-relaxed"
+                        >
+                          <span
+                            className="mt-2 h-1.5 w-1.5 rounded-full bg-orange-400 flex-shrink-0"
+                            aria-hidden="true"
+                          />
+                          <span>{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -292,11 +308,15 @@ export default function ParkingPage() {
               <h2 className="text-3xl font-bold">Hotel Shuttle Service</h2>
             </div>
             <p className="acc-card-base text-gray-700 leading-relaxed mb-2">
-              Shuttles (vans) run{" "}
-              <span className="font-semibold">only between the designated
-              hotels and the temple</span>
-              . They do not serve the parking garage — use the parking garage
-              bus for that.
+              Van shuttles operate{" "}
+              <span className="font-semibold">
+                between the temple and the designated hotel locations only, for
+                hotel guests only
+              </span>
+              {" "}
+              (Wyndham, Garner by IHG, Holiday Inn, Aloft, Courtyard Marriott).
+              Drivers parking at the deck should primarily use the parking-deck
+              bus below.
             </p>
             <p className="acc-card-base text-gray-600 mb-6">
               Shuttle timings are also shared in the Rajat Mahotsav WhatsApp
@@ -381,7 +401,7 @@ export default function ParkingPage() {
             <ScheduleCard table={hotelShuttleSchedule} />
           </motion.section>
 
-          {/* Parking Garage Bus */}
+          {/* Parking Deck Bus */}
           <motion.section
             id="parking-bus"
             initial={{ opacity: 0, y: 30 }}
@@ -392,12 +412,13 @@ export default function ParkingPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Bus className="h-8 w-8 text-indigo-500" />
-              <h2 className="text-3xl font-bold">Parking Garage Bus</h2>
+              <h2 className="text-3xl font-bold">Parking Deck Bus</h2>
             </div>
             <p className="acc-card-base text-gray-700 leading-relaxed mb-6">
               Buses run{" "}
               <span className="font-semibold">
-                only between the Harmon Meadow parking garage and the temple
+                between the temple and the multi-level parking deck at the Plaza
+                at Harmon Meadow
               </span>
               . Hotel guests should use the hotel shuttle above.
             </p>

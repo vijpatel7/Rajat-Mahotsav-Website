@@ -55,13 +55,13 @@ export const dropOffSteps: DropOffStep[] = [
   {
     step: 3,
     instruction:
-      "Drop off your passengers and exit toward Harmon Meadow to park.",
+      "Drop off your passengers and exit toward the multi-level parking deck at Harmon Meadow.",
   },
 ]
 
 export const mainParkingRule: ParkingRule = {
   id: "main-parking",
-  title: "Multi-Level Parking at the Plaza at Harmon Meadow",
+  title: "Multi-Level Parking Deck at the Plaza at Harmon Meadow",
   tone: "primary",
   summary:
     "After drop-off, drivers must park at the multi-level parking deck between the NBA and Extended Stay America buildings.",
@@ -79,15 +79,19 @@ export const otherParkingRules: ParkingRule[] = [
     title: "Street Parking — Swamibapa Way / Penhorn Avenue",
     tone: "conditional",
     summary:
-      "Limited street parking on Swamibapa Way / Penhorn Avenue is first-come, first-served, and is reserved for families with young children and senior citizens.",
-    details: [],
+      "Between 9:00 AM and 5:00 PM, street parking is available on a first-come, first-serve basis for families with young children and/or senior citizens. Parking directly across from the mandir is not allowed.",
+    details: [
+      "Do not park on both sides of the street.",
+      "Do not park where NO PARKING signs are posted.",
+      "If available, park on the left-hand side (mandir side) of the street past 300 Penhorn Ave.",
+    ],
   },
   {
     id: "evening-parking",
     title: "Evening Parking — After 5:00 PM",
     tone: "conditional",
     summary:
-      "After 5:00 PM, you may park in the lots across from the temple. Please keep these lots clean and take your trash with you.",
+      "After 5:00 PM, parking is permitted in any building lot across the Temple. Please maintain the cleanliness of these lots and do not leave any trash behind.",
     details: [],
   },
 ]
@@ -97,9 +101,9 @@ export const templeParkingRule: ParkingRule = {
   title: "No Parking at the Temple",
   tone: "prohibited",
   summary:
-    "Drop off your family at the temple, then park at Harmon Meadow. Absolutely no parking is permitted on the temple premises at any time, and no cars will be allowed on the grounds.",
+    "Drop off your family at the temple, then park at the multi-level parking deck at Harmon Meadow. Absolutely no parking is permitted on the temple premises at any time, and no cars will be allowed on the grounds.",
   details: [
-    "Use the designated drop-off area (marked with signage) before parking at the main parking location.",
+    "Use the designated drop-off area (marked with signage) before parking at the multi-level parking deck.",
   ],
 }
 
@@ -155,59 +159,60 @@ export const shuttleHotelsPending: { name: string }[] = [
 export const hotelShuttleSchedule: ScheduleTable = {
   id: "hotel-shuttle",
   title: "Hotel Shuttle Schedule",
-  origin: "Van service between the designated hotels and the temple only",
+  origin:
+    "Van shuttles operate between the temple and the designated hotel locations only, for hotel guests only",
   accent: "shuttle",
   entries: [
     {
       time: "5:30 AM",
-      description: "First pick-up from hotels for Mangla Aarti.",
+      description:
+        "First pick-up for Mangla Aarti (for both hotel guests and drivers at the parking lot).",
     },
     {
       time: "7:30 AM – 9:00 AM",
-      description: "Continuous shuttle between hotels and the temple.",
+      description: "Continuous shuttle service.",
     },
     {
       time: "9:00 AM",
-      description: "Final morning pick-up from hotels.",
+      description: "Final morning pick-up.",
     },
     {
       time: "1:30 PM – 2:30 PM",
-      description: "Afternoon return service to hotels.",
+      description: "Afternoon return service to hotels and the parking lot.",
     },
     {
       time: "3:30 PM – 4:30 PM",
-      description: "Evening pick-up resumes from the hotels.",
+      description: "Evening pick-up service resumes from the hotels.",
     },
     {
       time: "After night program",
-      description:
-        "Pick-up from Mandir back to designated hotels (Wyndham, Garner by IHG, Holiday Inn, Aloft, Courtyard Marriott).",
+      description: "Pick-up from Mandir to designated hotels.",
     },
   ],
 }
 
 export const parkingBusSchedule: ScheduleTable = {
   id: "parking-bus",
-  title: "Parking Garage Bus Schedule",
+  title: "Parking Deck Bus Schedule",
   origin:
-    "Bus service between Multi-Level Parking at the Plaza at Harmon Meadow and the temple only",
+    "Bus service between the temple and the multi-level parking deck at the Plaza at Harmon Meadow",
   accent: "bus",
   entries: [
     {
       time: "7:30 AM – 9:30 AM",
-      description: "Morning service from the parking garage.",
+      description: "Morning service to the Temple.",
     },
     {
       time: "1:00 PM – 2:30 PM",
-      description: "Early afternoon service from the parking garage.",
+      description: "Transportation to Parking Deck.",
     },
     {
       time: "4:00 PM – 5:30 PM",
-      description: "Late afternoon service from the parking garage.",
+      description: "Late afternoon service to the Temple.",
     },
     {
       time: "10:30 PM – 11:30 PM",
-      description: "Night service from the parking garage.",
+      description: "Transportation to Parking Deck.",
     },
   ],
 }
