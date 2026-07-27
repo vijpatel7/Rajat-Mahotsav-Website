@@ -5,6 +5,7 @@ import { useLoading } from "@/hooks/use-loading"
 import TodayHighlights, { DayOfEventTag } from "@/components/molecules/today-highlights"
 import Link from "next/link"
 import { Skiper53 } from "@/components/ui/skiper-ui/skiper53"
+import { getSchedulePageHref } from "@/lib/schedule-data"
 
 export default function TitleSection() {
   const { isLoading } = useLoading()
@@ -206,7 +207,7 @@ export default function TitleSection() {
                         className="flex flex-row gap-3 justify-center lg:justify-start pointer-events-auto"
                       >
                         <Link
-                          href="/schedule"
+                          href={getSchedulePageHref()}
                           className="group relative isolate inline-flex items-center justify-center gap-2 sm:gap-3 rounded-full px-6 sm:px-7 py-2.5 sm:py-3 font-sans font-bold text-sm sm:text-base text-slate-900 overflow-hidden transition-all border duration-300 hover:-translate-y-0.5 hover:scale-[1.03] active:scale-[0.99] shadow-[0_10px_26px_rgba(212,140,18,0.28)]"
                           style={{
                             borderColor: "rgba(226, 170, 70, 0.7)",

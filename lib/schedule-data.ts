@@ -25,6 +25,8 @@ export interface ScheduleDay {
 
 export const SCHEDULE_TIME_ZONE = "America/New_York"
 export const TOTAL_EVENT_DAYS = 7
+/** Homepage card rolls to the next day's highlights at this Eastern hour (24h). */
+export const HERO_SCHEDULE_ROLLOVER_HOUR = 22
 
 export const scheduleData: ScheduleDay[] = [
   {
@@ -65,15 +67,42 @@ export const scheduleData: ScheduleDay[] = [
     dayNumber: 2,
     isHighlight: true,
     highlights: [
-      { session: "Morning", title: "Opening Ceremony" },
+      { session: "Morning", title: "Grand Opening, Ribbon Cutting & Rajat Mahotsav Celebration" },
       { session: "Midday", title: "Lunch" },
-      { session: "Evening", title: "Shakotsav" },
+      { session: "Evening", title: "Shakotsav & Dinner" },
     ],
     events: [
-      { time: "Morning", title: "Opening Ceremony" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Evening", title: "Shakotsav" },
-      { time: "Evening", title: "Dinner" },
+      { time: "6:30 AM", title: "Mangala Aarti" },
+      {
+        time: "8:00 AM",
+        title: "Breakfast",
+        description: "Mix Bhajiya, Cereal, Milk, Juice, Fruits",
+      },
+      {
+        time: "9:00 AM – 12:30 PM",
+        title: "Morning Program",
+        items: [
+          "Parayan Vanchan",
+          "Grand Opening & Ribbon Cutting",
+          "Rajat Mahotsav Celebration",
+          "New Kirtan & Music Video Release",
+          "Rajat Mahotsav Seva Initiatives",
+          "Parayan Photos",
+        ],
+      },
+      {
+        time: "12:30 PM",
+        title: "Lunch",
+        description: "Mohanthal, Bindi nu Shak, Rajma, Puri, Rice, Kadi, Chaas",
+      },
+      { time: "5:30 PM", title: "Sandhya Aarti" },
+      { time: "6:00 PM – 7:30 PM", title: "Shakotsav" },
+      {
+        time: "8:00 PM",
+        title: "Dinner",
+        description:
+          "Bajri na Rotla, Khichdi, Gor Ghee, Bhungra, Mutter Paneer, Daal Fry, Jeera Rice, Naan, Mango Lassi",
+      },
     ],
   },
   {
@@ -218,28 +247,72 @@ export function getEasternDateIso(now: Date = new Date()): string {
   }).format(now)
 }
 
+function getEasternHour(now: Date = new Date()): number {
+  const hourPart = new Intl.DateTimeFormat("en-US", {
+    timeZone: SCHEDULE_TIME_ZONE,
+    hour: "2-digit",
+    hourCycle: "h23",
+  })
+    .formatToParts(now)
+    .find((part) => part.type === "hour")?.value
+
+  return Number(hourPart ?? "0")
+}
+
+function addOneCalendarDay(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number)
+  const next = new Date(Date.UTC(year, month - 1, day))
+  next.setUTCDate(next.getUTCDate() + 1)
+  return next.toISOString().slice(0, 10)
+}
+
+/**
+ * Calendar date used for the homepage schedule card. From 10:00 PM Eastern
+ * onward, the card advances to the next day's highlights.
+ */
+export function getHeroScheduleDisplayDateIso(now: Date = new Date()): string {
+  const todayIso = getEasternDateIso(now)
+  if (getEasternHour(now) < HERO_SCHEDULE_ROLLOVER_HOUR) {
+    return todayIso
+  }
+  return addOneCalendarDay(todayIso)
+}
+
 export type HeroScheduleState =
   | { kind: "pre-event"; day: ScheduleDay }
   | { kind: "event-day"; day: ScheduleDay }
   | { kind: "post-event"; day: ScheduleDay }
 
 export function getHeroScheduleState(now: Date = new Date()): HeroScheduleState {
-  const todayIso = getEasternDateIso(now)
+  const displayIso = getHeroScheduleDisplayDateIso(now)
   const firstDay = scheduleData[0]
   const lastDay = scheduleData[scheduleData.length - 1]
 
-  if (todayIso < firstDay.isoDate) {
+  if (displayIso < firstDay.isoDate) {
     return { kind: "pre-event", day: firstDay }
   }
 
-  if (todayIso > lastDay.isoDate) {
+  if (displayIso > lastDay.isoDate) {
     return { kind: "post-event", day: lastDay }
   }
 
-  const day = scheduleData.find((entry) => entry.isoDate === todayIso) ?? firstDay
+  const day = scheduleData.find((entry) => entry.isoDate === displayIso) ?? firstDay
   return { kind: "event-day", day }
 }
 
 export function formatHighlightsHeading(day: ScheduleDay): string {
   return `${day.dayName}, ${day.month} ${toOrdinal(Number(day.date))} Highlights`
+}
+
+/** Index of the day the schedule page should open for the current Eastern time. */
+export function getActiveScheduleDayIndex(now: Date = new Date()): number {
+  const { day } = getHeroScheduleState(now)
+  const index = scheduleData.findIndex((entry) => entry.isoDate === day.isoDate)
+  return index >= 0 ? index : 0
+}
+
+/** Homepage “Full Schedule” link — deep-links to the active day. */
+export function getSchedulePageHref(now: Date = new Date()): string {
+  const { day } = getHeroScheduleState(now)
+  return `/schedule?date=${day.isoDate}`
 }
