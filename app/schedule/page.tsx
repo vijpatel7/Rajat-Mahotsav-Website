@@ -5,11 +5,20 @@ import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { motion, AnimatePresence } from "framer-motion"
 import { Clock, MapPin, ChevronRight } from "lucide-react"
 import {
+  getActiveScheduleDayIndex,
   getEventCountExcludingMeals,
   getEasternDateIso,
   scheduleData,
   splitTimeRange,
 } from "@/lib/schedule-data"
+
+function resolveScheduleDayIndex(dateParam: string | null): number {
+  if (dateParam) {
+    const fromParam = scheduleData.findIndex((day) => day.isoDate === dateParam)
+    if (fromParam >= 0) return fromParam
+  }
+  return getActiveScheduleDayIndex()
+}
 
 export default function SchedulePage() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -23,12 +32,9 @@ export default function SchedulePage() {
   }, [])
 
   useEffect(() => {
-    const iso = getEasternDateIso()
-    setTodayIso(iso)
-    const todayIndex = scheduleData.findIndex((day) => day.isoDate === iso)
-    if (todayIndex >= 0) {
-      setSelectedDay(todayIndex)
-    }
+    setTodayIso(getEasternDateIso())
+    const dateParam = new URLSearchParams(window.location.search).get("date")
+    setSelectedDay(resolveScheduleDayIndex(dateParam))
   }, [])
 
   useEffect(() => {

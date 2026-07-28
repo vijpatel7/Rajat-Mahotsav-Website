@@ -7,6 +7,7 @@ import { useState, type CSSProperties } from "react"
 import { useLoading } from "@/hooks/use-loading"
 import TodayHighlights, { DayOfEventTag } from "@/components/molecules/today-highlights"
 import { getCloudflareImageBiggest } from "@/lib/cdn-assets"
+import { getSchedulePageHref } from "@/lib/schedule-data"
 
 // Mobile image carousel images (same as Skiper53)
 const carouselImages = [
@@ -224,7 +225,7 @@ export default function TitleSectionMobile() {
                     className="mt-7 flex flex-col min-[420px]:flex-row gap-2.5"
                   >
                     <Link
-                      href="/schedule"
+                      href={getSchedulePageHref()}
                       className="group relative isolate inline-flex w-full min-h-[3rem] min-[420px]:w-auto min-[420px]:flex-1 items-center justify-center gap-1.5 rounded-full px-4 font-sans font-bold text-sm overflow-hidden transition-all border active:scale-[0.99]"
                       style={{
                         borderColor: "rgba(255, 205, 120, 0.75)",
