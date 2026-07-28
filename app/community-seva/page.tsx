@@ -25,6 +25,7 @@ import { AnimatedTextSection } from "@/components/organisms/animated-text-sectio
 import { useToast } from "@/hooks/use-toast"
 import { StandardPageHeader } from "@/components/organisms/standard-page-header"
 import { PathOfServiceStory } from "@/components/organisms/path-of-service-story"
+import SevaLeaderboardTable from "@/components/organisms/seva-leaderboard-table"
 import { Toaster } from "@/components/molecules/toaster"
 import { cn } from "@/lib/utils"
 import { supabasePublic as supabase } from "@/utils/supabase/public-client"
@@ -454,6 +455,25 @@ export default function CommunityServicePage() {
                   />
                 ))}
               </div>
+
+              <motion.div
+                id="seva-hours"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mt-14"
+              >
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl lg:text-3xl font-bold community-text-primary mb-3">
+                    Seva Hours Leaderboard
+                  </h3>
+                  <p className="text-base lg:text-lg community-text-secondary max-w-3xl mx-auto">
+                    Total community seva hours by volunteer. Sort by hours or name, and browse page by page.
+                  </p>
+                </div>
+                <SevaLeaderboardTable />
+              </motion.div>
           </motion.div>
       </div>
       
