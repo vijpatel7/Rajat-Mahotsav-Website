@@ -159,16 +159,41 @@ export const scheduleData: ScheduleDay[] = [
     dayNumber: 4,
     isHighlight: true,
     highlights: [
-      { session: "Morning", title: "Morning Program" },
+      { session: "Morning", title: "Parayan Vanchan, Shobha Yatra & Aashirwad" },
       { session: "Midday", title: "Ladies Program" },
-      { session: "Evening", title: "Samuh Raas" },
+      { session: "Evening", title: "Samuh Raas & Dinner" },
     ],
     events: [
-      { time: "Morning", title: "Morning Program" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "Ladies Program" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Samuh Raas" },
+      { time: "6:30 AM", title: "Mangala Aarti" },
+      {
+        time: "8:00 AM",
+        title: "Breakfast",
+        description: "Vatidar Khaman, Green Chutney, Marcha, Cereal, Milk, Juice, Fruits",
+      },
+      {
+        time: "8:30 AM – 12:00 PM",
+        title: "Morning Program",
+        items: [
+          "Parayan Vanchan",
+          "Shobha Yatra",
+          "Chaab Arpan",
+          "Acharya Swamiji Maharaj’s Aashirwad",
+        ],
+      },
+      {
+        time: "12:30 PM",
+        title: "Lunch",
+        description:
+          "Kaju Chocolate Barfi, Lachko Moong, Mixed Vegetables, Kadi, Rice, Paratha, Fruit Salad, Chokha Papad, Chaas, Patra",
+      },
+      { time: "2:00 PM – 5:00 PM", title: "Ladies Program" },
+      { time: "6:00 PM", title: "Sandhya Aarti" },
+      {
+        time: "6:30 PM",
+        title: "Dinner",
+        description: "Vada Pav, Mexican Bhel, Badshai Khichdi, Chaas",
+      },
+      { time: "8:00 PM – 10:00 PM", title: "Samuh Raas" },
     ],
   },
   {
