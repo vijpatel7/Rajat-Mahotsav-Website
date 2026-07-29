@@ -113,15 +113,42 @@ export const scheduleData: ScheduleDay[] = [
     dayNumber: 3,
     isHighlight: true,
     highlights: [
-      { session: "Morning", title: "Gurupoonam" },
+      { session: "Morning", title: "Shobha Yatra, Gurupoonam Poojan & Aashirwad" },
       { session: "Midday", title: "Lunch" },
-      { session: "Evening", title: "Bhakti Sandhya" },
+      { session: "Evening", title: "Bhakti Sandhya & Dinner" },
     ],
     events: [
-      { time: "Morning", title: "Gurupoonam" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Bhakti Sandhya" },
+      { time: "6:30 AM", title: "Mangala Aarti" },
+      {
+        time: "8:00 AM",
+        title: "Breakfast",
+        description: "Ganthiya, Papadi, Marcha, Kadhi, Cereal, Milk, Juice, Fruits",
+      },
+      {
+        time: "9:00 AM – 1:00 PM",
+        title: "Gurupoonam Program",
+        items: [
+          "Shobha Yatra & Shahi Swagat",
+          "Chaab & Cake Arpan",
+          "Gurupoonam Poojan & Celebrations",
+          "Jeevanpran Swamibapa’s Aashirwad",
+          "Acharya Swamiji Maharaj’s Aashirwad",
+        ],
+      },
+      {
+        time: "1:00 PM",
+        title: "Lunch",
+        description:
+          "Motaiya Ladoo, Khaman, Desi Chana, Giloda Batata, Rotli, Daal, Bhaat, Chaas, Udad Papad, Mava Vari Anjir ni Barfi",
+      },
+      { time: "5:30 PM", title: "Sandhya Aarti" },
+      {
+        time: "6:30 PM",
+        title: "Dinner",
+        description:
+          "Pav Bhaji, Gulab Jamun, Masala Pulav, Chaas, Udad Papad, Khichdi, French Fries, Tomato/Cabbage/Lemon, Dahi/Chutney",
+      },
+      { time: "8:00 PM – 10:30 PM", title: "Bhakti Sandhya" },
     ],
   },
   {
