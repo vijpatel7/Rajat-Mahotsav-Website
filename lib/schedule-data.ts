@@ -204,16 +204,46 @@ export const scheduleData: ScheduleDay[] = [
     dayNumber: 5,
     isHighlight: true,
     highlights: [
-      { session: "Morning", title: "Morning Program" },
-      { session: "Midday", title: "Hindola Program" },
-      { session: "Evening", title: "Bhakti Nrutya" },
+      { session: "Morning", title: "Shikhar Poojan, Shobha Yatra & Aashirwad" },
+      { session: "Midday", title: "Lunch" },
+      { session: "Evening", title: "Hindola Utsav & Bhakti Nrutya" },
     ],
     events: [
-      { time: "Morning", title: "Morning Program" },
-      { time: "Afternoon", title: "Lunch" },
-      { time: "Afternoon", title: "Hindola Program" },
-      { time: "Evening", title: "Dinner" },
-      { time: "Evening", title: "Bhakti Nrutya" },
+      { time: "6:30 AM", title: "Mangala Aarti" },
+      {
+        time: "7:00 AM",
+        title: "Breakfast",
+        description: "Idli, Sambhar, Coconut Chutney, Cereal, Milk, Juice, Fruits",
+      },
+      {
+        time: "8:00 AM – 9:00 AM",
+        title: "Shikhar Poojan, Flag Raising & Aarti Parayan Vanchan",
+      },
+      {
+        time: "9:00 AM – 12:30 PM",
+        title: "Shobha Yatra & Aashirwad",
+        items: [
+          "Shobha Yatra",
+          "Chaab Arpan",
+          "Sant Samelan",
+          "Acharya Swamiji Maharaj’s Aashirwad",
+        ],
+      },
+      {
+        time: "12:30 PM",
+        title: "Lunch",
+        description:
+          "Shrikhand, Marble na Ladoo, Dudhi Chana Shak, Tuver Kathor, Samosa, Puri, Daal, Rice, Papad, Chaas",
+      },
+      { time: "5:00 PM – 7:00 PM", title: "Hindola Utsav" },
+      { time: "6:00 PM", title: "Sandhya Aarti" },
+      {
+        time: "6:30 PM",
+        title: "Dinner",
+        description:
+          "Paneer Tikka, Jeera Rice, Dal Makhani, Naan, Akhrot Anjir Kaju Halvo",
+      },
+      { time: "8:00 PM – 10:00 PM", title: "Bhakti Nrutya" },
     ],
   },
   {
